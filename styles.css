@@ -1,0 +1,110 @@
+/* All visual overrides are scoped to plugin-managed code or its settings. */
+.cp-code {
+  color: var(--cp-fg) !important;
+}
+.cp-code .cp-token {
+  background: transparent !important;
+}
+.cp-code.cp-inline.cp-background,
+.cp-editor-inline.cp-background {
+  background-color: var(--cp-bg) !important;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.cp-pre.cp-background,
+.cp-code.cp-block.cp-background {
+  background-color: var(--cp-bg) !important;
+}
+.cm-line.cp-code-line {
+  color: var(--cp-fg);
+}
+.cm-line.cp-code-line.cp-background {
+  background-color: var(--cp-bg) !important;
+}
+.cp-editor-block {
+  color: var(--cp-fg) !important;
+}
+.cp-editor-inline {
+  color: var(--cp-fg) !important;
+}
+.cp-syntax,
+.cp-token {
+  caret-color: var(--text-normal);
+}
+.cp-status {
+  cursor: pointer;
+}
+.cp-settings-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.cp-settings-header h2 {
+  margin-bottom: 4px;
+}
+.cp-version {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+.cp-description,
+.cp-settings-foot {
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.cp-description {
+  margin-top: 6px;
+}
+.cp-preview-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0 8px;
+  font-weight: var(--font-semibold);
+}
+.cp-settings .cp-preview {
+  color: var(--cp-fg);
+  padding: 16px 18px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  line-height: 1.65;
+  overflow: auto;
+  font-size: var(--font-smaller);
+  tab-size: 4;
+}
+.cp-settings .cp-preview.cp-background {
+  background-color: var(--cp-bg);
+}
+.cp-settings .cp-preview code {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  white-space: pre;
+  font-family: var(--font-monospace);
+}
+.cp-settings .setting-item-name,
+.cp-rule-path {
+  overflow-wrap: anywhere;
+}
+.cp-rule-path {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.cp-empty {
+  padding: 14px 0;
+  color: var(--text-muted);
+}
+.cp-picker-id {
+  float: right;
+  color: var(--text-faint);
+  margin-left: 18px;
+  font-size: var(--font-ui-small);
+}
+.cp-settings-foot {
+  margin-top: 28px;
+  border-top: 1px solid var(--background-modifier-border);
+  padding-top: 10px;
+  font-size: var(--font-ui-small);
+}
+.cp-settings-foot p {
+  margin: 6px 0;
+}
