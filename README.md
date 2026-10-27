@@ -17,6 +17,8 @@ v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独
 
 从 v0.1.2 发布页下载 `code-palette-v0.1.2.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖 main.js、manifest.json、styles.css 即可，保留自己的 data.json。
 
+社区安装对应的正式发布标签为 [`0.1.2`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.2)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。安装包文件名可以保留 `v`。历史 `v0.1.2` 发布保留。
+
 ## 使用
 
 ### 🎨 全局代码配色（不匹配语言）
@@ -40,6 +42,8 @@ v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独
 ## 开发
 
 Node.js 22+。运行 `npm ci`，再运行 `npm run check`。`npm run build` 在根目录生成 `main.js`；`npm run package` 生成安装包。单独修改 `data.json` 或主题配置不需要更改任何笔记。
+
+发布到 Obsidian 社区时，GitHub Release 标签必须等于清单版本（例如 `0.1.2`），并直接附加同次构建的 `main.js`、`manifest.json`、`styles.css`，不能只上传 ZIP。
 
 手机端预留兼容；历史 v0.1.1 在 Windows 桌面版实测。本轮 v0.1.2 仅做后台自动化验证，未进行前台实测。TextMate 语法高亮不包含语言服务器提供的语义着色。
 

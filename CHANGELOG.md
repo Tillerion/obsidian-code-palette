@@ -2,6 +2,9 @@
 
 ## 0.1.2
 
+- 📦 社区发布使用不带 `v` 的标签 `0.1.2`，与清单版本完全一致；重新打包的附件包含显示名 `Code Palette`。历史标签不变。
+- **Community release:** Tag `0.1.2` exactly matches the manifest. Refreshed assets include the compliant display name `Code Palette`; historical tags are preserved.
+
 - 🎨 新增设置项“全局代码配色（不匹配语言）”，默认关闭。
 - 沿用已有语言标记，无标记和暂不支持的语言只采用基础配色；不使用文件／文件夹的语言匹配规则。
 - 关闭后恢复原语言规则；保留原文、专用功能块和旧配置。

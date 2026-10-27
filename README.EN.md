@@ -6,7 +6,9 @@ An Obsidian plugin for independent code color themes, optional file/folder langu
 
 ## 📦 Install or update
 
-Download `code-palette-v0.1.2.zip` from the [release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/v0.1.2). Extract its `code-palette` folder into your vault's `.obsidian/plugins/` directory, then enable **Code Palette** in Community plugins.
+Download `code-palette-v0.1.2.zip` from the [release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.2). Extract its `code-palette` folder into your vault's `.obsidian/plugins/` directory, then enable **Code Palette** in Community plugins.
+
+The community-compatible release tag is exactly `0.1.2`, matching `manifest.json` without a `v` prefix. The ZIP filename may still contain `v`. The historical `v0.1.2` release is retained.
 
 For an update, disable the plugin, replace main.js, manifest.json and styles.css, keep your existing data.json, and enable it again.
 
@@ -52,6 +54,8 @@ These screenshots were captured during **v0.1.1** acceptance testing. They illus
 ## 🛠️ Build
 
 Use Node.js 22 or later. Run `npm ci`, then `npm run check`. `npm run package` generates the installation ZIP in `dist/`.
+
+For Obsidian community releases, use the exact manifest version as the GitHub release tag and attach `main.js`, `manifest.json` and `styles.css` directly from the same build, in addition to any optional ZIP.
 
 ## License
 
