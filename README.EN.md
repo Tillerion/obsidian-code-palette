@@ -6,7 +6,7 @@ An Obsidian plugin for independent code color themes, optional file/folder langu
 
 ## 📦 Install or update
 
-Download `code-palette-v0.1.2.zip` from the [release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/v0.1.2). Extract its `code-palette` folder into your vault's `.obsidian/plugins/` directory, then enable **Code Palette · 代码配色** in Community plugins.
+Download `code-palette-v0.1.2.zip` from the [release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/v0.1.2). Extract its `code-palette` folder into your vault's `.obsidian/plugins/` directory, then enable **Code Palette** in Community plugins.
 
 For an update, disable the plugin, replace main.js, manifest.json and styles.css, keep your existing data.json, and enable it again.
 

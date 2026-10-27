@@ -1,4 +1,4 @@
-# Code Palette · 代码配色
+# Code Palette
 
 [简体中文](README.md) · [English](README.EN.md)
 
@@ -15,7 +15,7 @@ v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独
 
 ## 安装
 
-从 v0.1.2 发布页下载 `code-palette-v0.1.2.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette · 代码配色**。更新时覆盖 main.js、manifest.json、styles.css 即可，保留自己的 data.json。
+从 v0.1.2 发布页下载 `code-palette-v0.1.2.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖 main.js、manifest.json、styles.css 即可，保留自己的 data.json。
 
 ## 使用
 
