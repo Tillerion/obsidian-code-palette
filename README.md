@@ -49,7 +49,7 @@ Node.js 22+。运行 `npm ci`，再运行 `npm run check`。`npm run build` 在�
 
 ## 🖼️ 历史实测截图
 
-以下图片来自 v0.1.1 的 Windows 实测，仅展示既有阅读／源码视图，**不是 v0.1.2 全局功能的前台验收截图**。本轮没有进行前台测试。
+以下图片来自 v0.1.1 的 Windows 实测，仅展示既有阅读／源码视图
 
 ![v0.1.1 阅读视图历史截图](docs/screenshots/v0.1.1-reading.png)
 
