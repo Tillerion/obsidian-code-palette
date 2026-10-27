@@ -24,6 +24,8 @@ await fs.cp(path.join(root, "licenses"), path.join(stage, "licenses"), {
 await fs.cp(path.join(root, "examples"), path.join(stage, "examples"), {
   recursive: true,
 });
+await fs.mkdir(path.join(stage,'docs'),{recursive:true});
+await fs.copyFile(path.join(root,'docs','verification.md'),path.join(stage,'docs','verification.md'));
 const lock = JSON.parse(
   await fs.readFile(path.join(root, "package-lock.json"), "utf8"),
 );
