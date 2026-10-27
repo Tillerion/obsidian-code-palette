@@ -11,7 +11,7 @@ import {
 import { languages, languageName, themes, themeName } from "./catalog";
 import type CodePalette from "./main";
 import type { Rule } from "./rules";
-import { resolveRule } from "./rules";
+import { resolveRule, cleanPath } from "./rules";
 export class LanguagePicker extends SuggestModal<{
   id: string;
   name: string;
@@ -94,6 +94,7 @@ export class RuleModal extends Modal {
     private path: string,
   ) {
     super(plugin.app);
+    path = this.path = cleanPath(path);
     const existing = plugin.settings.rules.find(
       (r) => r.kind === kind && r.path === path,
     );

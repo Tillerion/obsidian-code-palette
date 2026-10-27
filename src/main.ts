@@ -13,6 +13,8 @@ import {
   resolveRule,
   moveRules,
   activeTheme,
+  cleanPath,
+  setRule,
   type Settings,
   type Rule,
 } from "./rules";
@@ -73,22 +75,19 @@ export default class CodePalette extends Plugin implements PaletteHost {
         )
           return;
         const kind = file instanceof TFolder ? "folder" : "file";
+        const path = cleanPath(file.path);
         menu.addItem((item) =>
           item
             .setTitle("代码配色：设置语言规则")
             .setIcon("palette")
-            .onClick(() => new RuleModal(this, kind, file.path).open()),
+            .onClick(() => new RuleModal(this, kind, path).open()),
         );
-        if (
-          this.settings.rules.some(
-            (r) => r.kind === kind && r.path === file.path,
-          )
-        )
+        if (this.settings.rules.some((r) => r.kind === kind && r.path === path))
           menu.addItem((item) =>
             item
               .setTitle("代码配色：恢复继承")
               .setIcon("rotate-ccw")
-              .onClick(() => this.removeRule(kind, file.path)),
+              .onClick(() => this.removeRule(kind, path)),
           );
       }),
     );
@@ -225,16 +224,13 @@ export default class CodePalette extends Plugin implements PaletteHost {
     }
   }
   async upsertRule(rule: Rule) {
-    const i = this.settings.rules.findIndex(
-      (r) => r.kind === rule.kind && r.path === rule.path,
-    );
-    if (i < 0) this.settings.rules.push({ ...rule });
-    else this.settings.rules[i] = { ...rule };
+    this.settings.rules = setRule(this.settings.rules, rule);
     await this.saveSettings();
     this.settingsTab.display();
     new Notice("代码语言规则已保存");
   }
   async removeRule(kind: "file" | "folder", path: string) {
+    path = cleanPath(path);
     this.settings.rules = this.settings.rules.filter(
       (r) => r.kind !== kind || r.path !== path,
     );

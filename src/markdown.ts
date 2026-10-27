@@ -15,11 +15,28 @@ export interface CodeRegion {
 }
 export function findCodeRegions(source: string): CodeRegion[] {
   const regions: CodeRegion[] = [];
-  const frontmatter =
-    /^(?:\uFEFF)?---\r?\n[\s\S]*?\r?\n(?:---|\.\.\.)(?:\r?\n|$)/.exec(
-      source,
-    )?.[0].length ?? 0;
-  markdownParser.parse(source).iterate({
+  let frontmatter = 0;
+  const firstEnd = source.indexOf("\n");
+  if (firstEnd >= 0 && /^\uFEFF?---\r?$/.test(source.slice(0, firstEnd))) {
+    let from = firstEnd + 1;
+    while (from <= source.length) {
+      const newline = source.indexOf("\n", from),
+        to = newline < 0 ? source.length : newline;
+      if (/^(?:---|\.\.\.)[ \t]*\r?$/.test(source.slice(from, to))) {
+        frontmatter = newline < 0 ? to : to + 1;
+        break;
+      }
+      if (newline < 0) break;
+      from = newline + 1;
+    }
+  }
+  // Mask before parsing: YAML may contain unmatched Markdown fences/backticks.
+  // Keeping every CR/LF and UTF-16 position makes all source mappings exact.
+  const parseSource = frontmatter
+    ? source.slice(0, frontmatter).replace(/[^\r\n]/g, " ") +
+      source.slice(frontmatter)
+    : source;
+  markdownParser.parse(parseSource).iterate({
     enter(node) {
       if (node.to <= frontmatter) return false;
       if (node.name === "InlineCode") {

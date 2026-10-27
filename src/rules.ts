@@ -35,6 +35,14 @@ export function defaultSettings(): Settings {
 export function cleanPath(path: string): string {
   return path.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
 }
+export function setRule(rules: Rule[], rule: Rule): Rule[] {
+  const next = { ...rule, path: cleanPath(rule.path) };
+  const index = rules.findIndex(
+    (r) => r.kind === next.kind && cleanPath(r.path) === next.path,
+  );
+  if (index < 0) return [...rules, next];
+  return rules.map((r, i) => (i === index ? next : r));
+}
 export function resolveRule(
   path: string,
   settings: Settings,

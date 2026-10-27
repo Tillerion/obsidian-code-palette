@@ -6,7 +6,17 @@ import {
   chooseLanguage,
   moveRules,
   normalizeSettings,
+  setRule,
 } from "../src/rules.ts";
+test("root-folder rules work immediately and normalize duplicate paths", () => {
+  const s = defaultSettings();
+  s.rules = setRule(s.rules, rule("folder", "/", "cpp"));
+  assert.equal(resolveRule("note.md", s)?.language, "cpp");
+  assert.equal(s.rules[0].path, "");
+  s.rules = setRule(s.rules, rule("folder", "", "java"));
+  assert.equal(s.rules.length, 1);
+  assert.equal(resolveRule("deep/note.md", s)?.language, "java");
+});
 
 const rule = (
   kind: "file" | "folder",

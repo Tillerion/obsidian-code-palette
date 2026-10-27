@@ -1,6 +1,24 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { findCodeRegions } from "../src/markdown.ts";
+test("YAML literal fences cannot change body parsing", () => {
+  const s = "---\nexample: |\n  ```python\n---\nBody `return 42`";
+  const r = findCodeRegions(s);
+  assert.equal(r.length, 1);
+  assert.equal(r[0].kind, "inline");
+  assert.equal(r[0].text, "return 42");
+  assert.equal(
+    s.slice(r[0].segments[0].from, r[0].segments[0].to),
+    "return 42",
+  );
+});
+test("empty frontmatter ends immediately, before later horizontal rules", () => {
+  const r = findCodeRegions("---\n---\n\n`return 42`\n\n---\n");
+  assert.deepEqual(
+    r.map((x) => x.text),
+    ["return 42"],
+  );
+});
 test("table inline spans and multiple backticks are found without treating escaped ticks as code", () => {
   const s = "| 方法 |\n|---|\n| `find(x)` |\n\n``a ` b`` and \\`plain\\`";
   const r = findCodeRegions(s);

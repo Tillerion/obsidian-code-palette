@@ -14,6 +14,90 @@ async function until(check: () => boolean) {
     await new Promise((r) => setTimeout(r, 20));
   }
 }
+test("a long block only emits marks inside visible ranges while preserving multiline context", async () => {
+  const dom = new JSDOM('<!doctype html><body><div id="editor"></div></body>', {
+    pretendToBeVisual: true,
+  });
+  for (const key of [
+    "window",
+    "document",
+    "Window",
+    "MutationObserver",
+    "HTMLElement",
+    "Node",
+    "getComputedStyle",
+  ] as const)
+    Object.defineProperty(globalThis, key, {
+      value: (dom.window as any)[key],
+      configurable: true,
+      writable: true,
+    });
+  const range = dom.window.Range.prototype as any;
+  range.getClientRects = () => [];
+  range.getBoundingClientRect = () => ({
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    width: 0,
+    height: 0,
+  });
+  const listeners = new Set<() => void>(),
+    h = new Highlighter(),
+    settings = defaultSettings();
+  settings.defaultRule = {
+    kind: "folder",
+    path: "",
+    enabled: true,
+    language: "python",
+    inline: true,
+    blocks: true,
+    recursive: true,
+  };
+  const host: PaletteHost = {
+    settings,
+    highlighter: h,
+    revision: 0,
+    active: true,
+    theme: () => "nord",
+    subscribe: (f) => {
+      listeners.add(f);
+      return () => listeners.delete(f);
+    },
+    reportError: (e) => {
+      throw e;
+    },
+  };
+  const source = "```python\n" + "x = 1\n".repeat(10000) + "```";
+  const extension = createEditorExtension(host, () => "long.md");
+  const view = new EditorView({
+    state: EditorState.create({ doc: source, extensions: [extension] }),
+    parent: dom.window.document.querySelector("#editor")!,
+  });
+  try {
+    await until(() => Boolean(view.plugin(extension)?.decorations.size));
+    const outside: { from: number; to: number }[] = [];
+    view
+      .plugin(extension)!
+      .decorations.between(0, source.length, (from: number, to: number) => {
+        if (
+          from !== to &&
+          !view.visibleRanges.some((v) => from >= v.from && to <= v.to)
+        )
+          outside.push({ from, to });
+      });
+    assert.equal(
+      outside.length,
+      0,
+      "offscreen token/base marks must be clipped",
+    );
+    assert.equal(view.state.doc.toString(), source);
+  } finally {
+    view.destroy();
+    h.dispose();
+    dom.window.close();
+  }
+});
 test("real CM6 colors inline and explicit Java without changing source; rule updates clear colors", async () => {
   const dom = new JSDOM('<!doctype html><body><div id="editor"></div></body>', {
     pretendToBeVisual: true,

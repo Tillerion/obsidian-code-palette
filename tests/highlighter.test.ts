@@ -1,6 +1,26 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Highlighter } from "../src/highlighter.ts";
+import { languages, themes } from "../src/catalog.ts";
+
+test("every bundled grammar and theme loads offline and preserves CRLF and Unicode offsets", async () => {
+  const h = new Highlighter(),
+    code = 'return "😀中文";\r\n// next\r\n';
+  try {
+    for (const lang of languages) {
+      const r = await h.highlight(code, lang.id, "one-dark-pro");
+      assert.ok(r, lang.id);
+      assert.equal(r.tokens.map((t) => t.text).join(""), code, lang.id);
+    }
+    for (const theme of themes) {
+      const r = await h.highlight("return 42", "python", theme.id);
+      assert.ok(r, theme.id);
+      assert.match(r.background, /^#(?:[0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+    }
+  } finally {
+    h.dispose();
+  }
+});
 
 test("real offline grammars color Python C++ and Java and preserve every source character", async () => {
   const h = new Highlighter();
