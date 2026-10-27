@@ -69,7 +69,11 @@ const result = spawnSync(
     "-Command",
     "Compress-Archive -LiteralPath $env:CP_STAGE -DestinationPath $env:CP_ZIP -CompressionLevel Optimal -Force",
   ],
-  { env: { ...process.env, CP_STAGE: stage, CP_ZIP: zip }, encoding: "utf8" },
+  {
+    env: { ...process.env, CP_STAGE: stage, CP_ZIP: zip },
+    encoding: "utf8",
+    windowsHide: true,
+  },
 );
 if (result.status !== 0)
   throw new Error(result.stderr || result.stdout || "ZIP packaging failed");

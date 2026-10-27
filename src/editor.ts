@@ -80,7 +80,11 @@ export function createEditorExtension(
         try {
           const items = await Promise.all(
             selected.map(async (region) => {
-              const lang = chooseLanguage(region.language, rule.language);
+              const lang = chooseLanguage(
+                region.language,
+                rule.language,
+                rule.paletteOnly,
+              );
               return {
                 region,
                 result: lang

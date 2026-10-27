@@ -1,7 +1,7 @@
 {
   "id": "code-palette",
   "name": "Code Palette · 代码配色",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "minAppVersion": "1.8.0",
   "description": "按文件或文件夹设置默认代码语言，为行内代码和代码块应用独立配色，保留已有语言标记。",
   "author": "Skrch",

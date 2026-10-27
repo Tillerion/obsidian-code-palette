@@ -34,6 +34,46 @@ const rule = (
   ...extra,
 });
 
+test("global palette bypasses saved language rules and restores them when disabled", () => {
+  const s = defaultSettings();
+  s.rules = [rule("file", "note.md", "cpp", { enabled: false })];
+  s.globalPalette = true;
+  const global = resolveRule("note.md", s);
+  assert.equal(global?.enabled, true);
+  assert.equal(global?.language, "text");
+  assert.equal(global?.paletteOnly, true);
+  assert.equal(resolveRule("unconfigured/deep/note.md", s)?.paletteOnly, true);
+  assert.equal(s.rules[0].enabled, false);
+  assert.equal(s.rules[0].language, "cpp");
+  s.globalPalette = false;
+  assert.equal(resolveRule("note.md", s)?.enabled, false);
+  assert.equal(resolveRule("unconfigured.md", s), null);
+  s.globalPalette = true;
+  s.enabled = false;
+  assert.equal(resolveRule("note.md", s), null);
+});
+test("global palette never supplies or guesses a language for unlabelled code", () => {
+  assert.equal(chooseLanguage("", "python", true), "text");
+  assert.equal(chooseLanguage("java", "python", true), "java");
+  assert.equal(chooseLanguage("c++", "python", true), "cpp");
+  assert.equal(chooseLanguage("txt", "python", true), "text");
+  assert.equal(chooseLanguage("not-supported", "python", true), "text");
+  assert.equal(chooseLanguage("mermaid", "python", true), null);
+  assert.equal(chooseLanguage("dataview", "python", true), null);
+});
+test("persisted global palette is opt-in and invalid values preserve old behavior", () => {
+  assert.equal(
+    resolveRule("note.md", normalizeSettings({ globalPalette: true }))
+      ?.paletteOnly,
+    true,
+  );
+  assert.equal(resolveRule("note.md", normalizeSettings({})), null);
+  assert.equal(
+    resolveRule("note.md", normalizeSettings({ globalPalette: "true" })),
+    null,
+  );
+});
+
 test("file beats nearest folder, which beats ancestor and vault default", () => {
   const s = defaultSettings();
   s.defaultRule = rule("folder", "", "java");

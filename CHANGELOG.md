@@ -1,5 +1,14 @@
 # 更新记录
 
+## 0.1.2
+
+- 🎨 新增设置项“全局代码配色（不匹配语言）”，默认关闭。
+- 沿用已有语言标记，无标记和暂不支持的语言只采用基础配色；不使用文件／文件夹的语言匹配规则。
+- 关闭后恢复原语言规则；保留原文、专用功能块和旧配置。
+- 本轮仅后台测试、构建与审查，未进行前台测试。
+
+**English:** Added an opt-in vault-wide palette mode without language inference. Explicit fence languages are retained; unlabelled/unsupported code receives plain theme colors. Saved language rules resume when disabled. Verified in background tests only.
+
 ## 0.1.1
 
 - 补齐真实 Obsidian 桌面端验收，原 v0.1 标签保留。

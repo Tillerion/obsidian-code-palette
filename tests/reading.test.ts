@@ -12,6 +12,71 @@ async function until(check: () => boolean) {
     await new Promise((r) => setTimeout(r, 15));
   }
 }
+test("global palette themes all ordinary code but only labelled blocks get language tokens", async () => {
+  const d = new JSDOM(
+    '<section><code id="inline">return False</code><pre><code id="bare">return False</code></pre><pre><code id="java" class="language-java">public class Demo {}</code></pre><pre><code id="unknown" class="language-unlisted">return False</code></pre><pre><code id="diagram" class="language-mermaid">graph LR; A --> B</code></pre></section>',
+  );
+  const root = d.window.document.querySelector("section")!,
+    h = new Highlighter(),
+    settings = defaultSettings(),
+    listeners = new Set<() => void>();
+  settings.globalPalette = true;
+  settings.defaultRule = {
+    kind: "folder",
+    path: "",
+    language: "python",
+    enabled: true,
+    inline: true,
+    blocks: true,
+    recursive: true,
+  };
+  const host: PaletteHost = {
+    highlighter: h,
+    settings,
+    revision: 0,
+    active: true,
+    theme: () => "one-dark-pro",
+    subscribe: (f) => {
+      listeners.add(f);
+      return () => listeners.delete(f);
+    },
+    reportError: (e) => {
+      throw e;
+    },
+  };
+  const controller = new ReadingController(root, "anywhere/note.md", host),
+    text = root.textContent;
+  const colors = (id: string) =>
+    new Set(
+      [...root.querySelectorAll<HTMLElement>(`#${id} .cp-token`)].map(
+        (t) => t.style.color,
+      ),
+    );
+  try {
+    await until(() => root.querySelectorAll(".cp-code").length === 4);
+    assert.equal(colors("inline").size, 1);
+    assert.equal(colors("bare").size, 1);
+    assert.equal(colors("unknown").size, 1);
+    assert.ok(colors("java").size > 1);
+    assert.equal(
+      root.querySelector("#diagram")!.classList.contains("cp-code"),
+      false,
+    );
+    assert.equal(root.textContent, text);
+    settings.globalPalette = false;
+    listeners.forEach((f) => f());
+    await until(() => colors("inline").size > 1);
+    assert.equal(
+      root.querySelector("#unknown")!.classList.contains("cp-code"),
+      false,
+    );
+    assert.equal(root.textContent, text);
+  } finally {
+    controller.dispose();
+    h.dispose();
+    d.window.close();
+  }
+});
 test("pending native mutations survive another block completing its asynchronous paint", async () => {
   const d = new JSDOM(
       '<section><code id="a">return 1</code><code id="b">return 2</code></section>',

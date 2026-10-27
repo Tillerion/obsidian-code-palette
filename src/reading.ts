@@ -64,7 +64,7 @@ export class ReadingController {
               .find((c) => c.startsWith("language-"))
               ?.slice(9) ?? "")
           : "";
-        const lang = chooseLanguage(explicit, rule.language);
+        const lang = chooseLanguage(explicit, rule.language, rule.paletteOnly);
         if (!lang) return;
         const text = code.textContent ?? "";
         try {

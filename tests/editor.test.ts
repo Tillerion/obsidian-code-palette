@@ -98,7 +98,7 @@ test("a long block only emits marks inside visible ranges while preserving multi
     dom.window.close();
   }
 });
-test("real CM6 colors inline and explicit Java without changing source; rule updates clear colors", async () => {
+test("real CM6 global palette preserves Java, leaves inline code plain, and restores rules when disabled", async () => {
   const dom = new JSDOM('<!doctype html><body><div id="editor"></div></body>', {
     pretendToBeVisual: true,
   });
@@ -153,6 +153,7 @@ test("real CM6 colors inline and explicit Java without changing source; rule upd
     },
   };
   const source = "正文 `return 42`\n\n```java\npublic class Demo {}\n```";
+  settings.globalPalette = true;
   const view = new EditorView({
     state: EditorState.create({
       doc: source,
@@ -171,6 +172,20 @@ test("real CM6 colors inline and explicit Java without changing source; rule upd
         ),
       ).size >= 2,
     );
+    const inlineColors = () => {
+      const inline = view.dom.querySelector<HTMLElement>(".cp-editor-inline");
+      if (!inline) return new Set<string>();
+      const tokens = [...inline.querySelectorAll<HTMLElement>(".cp-syntax")];
+      // Equal-range CM6 marks may put the syntax wrapper outside the base mark.
+      const outer = inline.closest<HTMLElement>(".cp-syntax");
+      if (outer) tokens.push(outer);
+      return new Set(tokens.map((n) => n.style.color));
+    };
+    assert.equal(inlineColors().size, 1);
+    settings.globalPalette = false;
+    host.revision++;
+    listeners.forEach((f) => f());
+    await until(() => inlineColors().size > 1);
     settings.enabled = false;
     host.revision++;
     listeners.forEach((f) => f());

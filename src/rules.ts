@@ -10,6 +10,7 @@ export interface Rule {
 }
 export interface Settings {
   enabled: boolean;
+  globalPalette: boolean;
   rules: Rule[];
   defaultRule: Rule | null;
   themeMode: "auto" | "fixed";
@@ -22,6 +23,7 @@ export interface Settings {
 export function defaultSettings(): Settings {
   return {
     enabled: true,
+    globalPalette: false,
     rules: [],
     defaultRule: null,
     themeMode: "auto",
@@ -46,8 +48,20 @@ export function setRule(rules: Rule[], rule: Rule): Rule[] {
 export function resolveRule(
   path: string,
   settings: Settings,
-): (Rule & { source: string }) | null {
+): (Rule & { source: string; paletteOnly?: boolean }) | null {
   if (!settings.enabled) return null;
+  if (settings.globalPalette)
+    return {
+      kind: "folder",
+      path: "",
+      enabled: true,
+      language: "text",
+      inline: true,
+      blocks: true,
+      recursive: true,
+      source: "全局代码配色（不匹配语言）",
+      paletteOnly: true,
+    };
   path = cleanPath(path);
   const file = settings.rules.find((r) => r.kind === "file" && r.path === path);
   if (file) return { ...file, source: `文件：${file.path}` };
@@ -68,13 +82,14 @@ export function resolveRule(
 export function chooseLanguage(
   explicit: string,
   fallback: string,
+  paletteOnly = false,
 ): string | null {
   const id = explicit.trim().split(/\s+/)[0].toLowerCase();
   if (id)
     return functionalLanguages.has(id) || id.startsWith("ad-")
       ? null
-      : canonicalLanguage(id);
-  return canonicalLanguage(fallback);
+      : (canonicalLanguage(id) ?? (paletteOnly ? "text" : null));
+  return paletteOnly ? "text" : canonicalLanguage(fallback);
 }
 export function moveRules(
   rules: Rule[],
@@ -93,7 +108,7 @@ export function normalizeSettings(raw: unknown): Settings {
   const d = defaultSettings();
   if (!raw || typeof raw !== "object") return d;
   const v = raw as Record<string, unknown>;
-  for (const k of ["enabled", "blockBackground"] as const)
+  for (const k of ["enabled", "globalPalette", "blockBackground"] as const)
     if (typeof v[k] === "boolean") d[k] = v[k];
   if (v.themeMode === "auto" || v.themeMode === "fixed")
     d.themeMode = v.themeMode;

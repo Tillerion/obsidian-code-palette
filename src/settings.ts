@@ -44,6 +44,17 @@ export class PaletteSettings extends PluginSettingTab {
           await this.plugin.saveSettings();
         }),
       );
+    new Setting(el)
+      .setName("全局代码配色（不匹配语言）")
+      .setDesc(
+        "为整个仓库的行内代码和普通代码块使用所选配色。只沿用代码块已有的语言标记；没有标记或暂不支持的语言仅应用基础文字色和背景色，不猜测语言。开启后暂不使用下面的语言规则，关闭后恢复。",
+      )
+      .addToggle((t) =>
+        t.setValue(this.plugin.settings.globalPalette).onChange(async (v) => {
+          this.plugin.settings.globalPalette = v;
+          await this.plugin.saveSettings();
+        }),
+      );
     new Setting(el).setName("代码配色").setHeading();
     new Setting(el).setName("切换方式").addDropdown((d) =>
       d
