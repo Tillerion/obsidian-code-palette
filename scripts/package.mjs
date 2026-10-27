@@ -22,6 +22,7 @@ const files = [
   "manifest.json",
   "styles.css",
   "README.md",
+  "README.EN.md",
   "LICENSE",
   "THIRD_PARTY_NOTICES.md",
   "CHANGELOG.md",
@@ -38,6 +39,11 @@ await fs.mkdir(path.join(stage, "docs"), { recursive: true });
 await fs.copyFile(
   path.join(root, "docs", "verification.md"),
   path.join(stage, "docs", "verification.md"),
+);
+await fs.cp(
+  path.join(root, "docs", "screenshots"),
+  path.join(stage, "docs", "screenshots"),
+  { recursive: true },
 );
 const lock = JSON.parse(
   await fs.readFile(path.join(root, "package-lock.json"), "utf8"),

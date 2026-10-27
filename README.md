@@ -1,8 +1,10 @@
 # Code Palette · 代码配色
 
+[简体中文](README.md) · [English](README.EN.md)
+
 v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。新增可选的全局代码配色模式，不需要设置语言规则。历史版本标签保留。
 
-源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（私有仓库，需要登录有权限的 GitHub 账号）。
+源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（公有仓库）。
 
 - 文件、文件夹（可递归）和仓库默认语言；文件规则优先于最近的文件夹规则。
 - 🎨 全局代码配色：只沿用代码块已有语言，无标记代码不匹配、不猜测语言。
@@ -44,6 +46,14 @@ Node.js 22+。运行 `npm ci`，再运行 `npm run check`。`npm run build` 在�
 单段代码超过 200,000 个字符时回退原显示，避免大段同步分词阻塞编辑器。语法高亮只为可识别的词元着色，普通变量和不完整片段不一定呈现多种颜色。修改已有规则后会刷新已打开的阅读／编辑视图。
 
 验证范围和实测记录见 [docs/verification.md](docs/verification.md)。
+
+## 🖼️ 历史实测截图
+
+以下图片来自 v0.1.1 的 Windows 实测，仅展示既有阅读／源码视图，**不是 v0.1.2 全局功能的前台验收截图**。本轮没有进行前台测试。
+
+![v0.1.1 阅读视图历史截图](docs/screenshots/v0.1.1-reading.png)
+
+![v0.1.1 源码模式历史截图](docs/screenshots/v0.1.1-source.png)
 
 ## 许可
 
