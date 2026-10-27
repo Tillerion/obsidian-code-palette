@@ -26,25 +26,25 @@
 ### Task 1: Rules and resource engine
 Files: src/rules.ts, src/catalog.ts, src/highlighter.ts; tests/rules.test.ts, tests/highlighter.test.ts.
 Interfaces: resolveRule(path, settings), chooseLanguage(explicit, fallback), Highlighter.highlight(code, lang, theme).
-- [ ] Write failing tests for inheritance, exclusions, recursion, renames and explicit languages.
-- [ ] Run failing tests, implement pure rules and validation, run passing tests.
-- [ ] Test real Shiki token results, source offsets, language aliases, multiline state and theme differences; implement and verify.
+- [x] Write failing tests for inheritance, exclusions, recursion, renames and explicit languages.
+- [x] Run failing tests, implement pure rules and validation, run passing tests.
+- [x] Test real Shiki token results, source offsets, language aliases, multiline state and theme differences; implement and verify.
 
 ### Task 2: Reading/editor rendering
 Files: src/markdown.ts, src/reading.ts, src/editor.ts; tests/markdown.test.ts, tests/reading.test.ts.
 Interfaces: findCodeRegions(text), applyReadingCode(element, result, background), createEditorExtension(host).
-- [ ] Write failing tests for code region boundaries, escapes, fences, tables, indented code and DOM restoration.
-- [ ] Implement scanning, safe token spans and scoped marks, including full-block token context and visible-range decoration.
-- [ ] Verify original content and protection of functional blocks and unknown languages.
+- [x] Write failing tests for code region boundaries, escapes, fences, tables, indented code and DOM restoration.
+- [x] Implement scanning, safe token spans and scoped marks, including full-block token context and visible-range decoration.
+- [x] Verify original content and protection of functional blocks and unknown languages.
 
 ### Task 3: Plugin UI and lifecycle
 Files: src/main.ts, src/settings.ts, src/modals.ts, styles.css.
-- [ ] Wire settings, per-note status, rule changes and rename/delete hooks; validate persisted inputs.
-- [ ] Implement searchable language selection, rule editor, theme preview and settings rule list.
-- [ ] Verify real Obsidian reading/live/source views, menus, settings refresh and unload using dedicated test vault.
+- [x] Wire settings, per-note status, rule changes and rename/delete hooks; validate persisted inputs.
+- [x] Implement searchable language selection, rule editor, theme preview and settings rule list.
+- [x] Verify real Obsidian reading/live/source views, menus, settings refresh and unload using dedicated test vault.
 
 ### Task 4: Delivery and review
 Files: scripts/package.mjs, docs/verification.md, README.md, THIRD_PARTY_NOTICES.md.
-- [ ] Run full tests, typecheck and production build; package source and install ZIP.
-- [ ] Independent review and necessary fixes; rerun affected/full checks.
-- [ ] Commit only project files, create private repository, push main and v0.1 tag, verify remote visibility and revision.
+- [x] Run full tests, typecheck and production build; package source and install ZIP.
+- [x] Independent review and necessary fixes; rerun affected/full checks.
+- [x] Commit only project files, create private repository, push main and v0.1 tag, verify remote visibility and revision.

@@ -1,4 +1,8 @@
 import * as esbuild from "esbuild";
+import { readFileSync } from "node:fs";
+const { version } = JSON.parse(
+  readFileSync(new URL("./manifest.json", import.meta.url), "utf8"),
+);
 const options = {
   entryPoints: ["src/main.ts"],
   bundle: true,
@@ -16,7 +20,7 @@ const options = {
   minify: !process.argv.includes("--watch"),
   sourcemap: false,
   banner: {
-    js: "/* Code Palette v0.1.0 | MIT | See THIRD_PARTY_NOTICES.md */",
+    js: `/* Code Palette v${version} | MIT | See THIRD_PARTY_NOTICES.md */`,
   },
 };
 if (process.argv.includes("--watch")) {

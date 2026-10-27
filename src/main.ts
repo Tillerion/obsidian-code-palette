@@ -2,6 +2,7 @@ import {
   Plugin,
   Notice,
   MarkdownRenderChild,
+  MarkdownView,
   TFile,
   TFolder,
   editorInfoField,
@@ -32,6 +33,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
   revision = 0;
   private listeners = new Set<() => void>();
   private readers = new Set<ReadingController>();
+  private startupReaders = new Map<MarkdownView, ReadingController>();
   private observed = new Set<Document>();
   private status!: HTMLElement;
   private lastError = 0;
@@ -65,8 +67,14 @@ export default class CodePalette extends Plugin implements PaletteHost {
       this.app.workspace.on("active-leaf-change", () => this.updateStatus()),
     );
     this.registerEvent(
-      this.app.workspace.on("file-open", () => this.updateStatus()),
+      this.app.workspace.on("file-open", () => this.refresh()),
     );
+    this.registerEvent(
+      this.app.workspace.on("layout-change", () => this.seedOpenViews()),
+    );
+    this.app.workspace.onLayoutReady(() => {
+      if (this.active) this.seedOpenViews();
+    });
     this.registerEvent(
       this.app.workspace.on("file-menu", (menu, file) => {
         if (
@@ -160,6 +168,29 @@ export default class CodePalette extends Plugin implements PaletteHost {
       },
     });
     this.updateStatus();
+  }
+  private seedOpenViews() {
+    if (!this.active) return;
+    const views = new Set<MarkdownView>();
+    for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
+      if (!(leaf.view instanceof MarkdownView)) continue;
+      const view = leaf.view;
+      views.add(view);
+      if (this.startupReaders.has(view)) continue;
+      const controller = new ReadingController(
+        view.contentEl,
+        () => view.file?.path ?? "",
+        this,
+      );
+      this.startupReaders.set(view, controller);
+      this.readers.add(controller);
+    }
+    for (const [view, controller] of this.startupReaders)
+      if (!views.has(view)) {
+        controller.dispose();
+        this.readers.delete(controller);
+        this.startupReaders.delete(view);
+      }
   }
   private processReading(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
     if (!el.querySelector("code") && el.tagName !== "CODE") return;
@@ -270,6 +301,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
     this.revision++;
     for (const r of [...this.readers]) r.dispose();
     this.readers.clear();
+    this.startupReaders.clear();
     for (const callback of [...this.listeners]) callback();
     this.listeners.clear();
     this.highlighter.dispose();

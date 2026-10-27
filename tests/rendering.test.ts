@@ -3,6 +3,25 @@ import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";
 import { applyCode, restoreCode } from "../src/rendering.ts";
 import { Highlighter } from "../src/highlighter.ts";
+test("native highlighter replacing same-text nodes is preserved during cleanup", async () => {
+  const d = new JSDOM("<pre><code>return 42</code></pre>"),
+    el = d.window.document.querySelector("code")!,
+    h = new Highlighter();
+  try {
+    const result = await h.highlight("return 42", "python", "nord");
+    assert.ok(result);
+    const record = applyCode(el, result, true);
+    el.innerHTML = '<span class="token keyword">return</span> 42';
+    const native = el.firstChild;
+    restoreCode(record);
+    assert.equal(el.firstChild, native);
+    assert.equal(el.querySelector(".token")?.textContent, "return");
+    assert.equal(el.classList.contains("cp-code"), false);
+  } finally {
+    h.dispose();
+    d.window.close();
+  }
+});
 test("reading highlight preserves copy text and original nodes, scoped styles restore exactly", async () => {
   const dom = new JSDOM(
     '<p>正文<code class="old" style="padding:2px"><span>return "&lt;中文&gt;"</span></code></p>',

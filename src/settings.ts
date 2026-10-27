@@ -27,7 +27,10 @@ export class PaletteSettings extends PluginSettingTab {
     el.addClass("cp-settings");
     const header = el.createDiv({ cls: "cp-settings-header" });
     header.createEl("h2", { text: "Code Palette" });
-    header.createSpan({ text: "v0.1", cls: "cp-version" });
+    header.createSpan({
+      text: `v${this.plugin.manifest.version}`,
+      cls: "cp-version",
+    });
     el.createEl("p", {
       text: "按笔记设置语言，为代码选择独立配色。已有语言标记始终保留。",
       cls: "cp-description",

@@ -12,6 +12,7 @@ export interface CodeRecord {
   children: Node[];
   text: string;
   paint: Paint[];
+  renderedChildren: Node[];
 }
 function paint(
   el: HTMLElement,
@@ -62,6 +63,7 @@ export function applyCode(
     children: Array.from(el.childNodes),
     text: el.textContent ?? "",
     paint: [],
+    renderedChildren: [],
   };
   const vars = { "--cp-fg": result.foreground, "--cp-bg": result.background };
   record.paint.push(
@@ -80,11 +82,29 @@ export function applyCode(
       paint(pre, ["cp-pre", ...(background ? ["cp-background"] : [])], vars),
     );
   appendTokens(el, result);
+  record.renderedChildren = Array.from(el.childNodes);
   return record;
 }
+export function isCodePaintIntact(record: CodeRecord): boolean {
+  return (
+    record.el.textContent === record.text &&
+    record.el.childNodes.length === record.renderedChildren.length &&
+    record.renderedChildren.every(
+      (node, index) => record.el.childNodes[index] === node,
+    )
+  );
+}
 export function restoreCode(record: CodeRecord) {
-  if (record.el.textContent === record.text)
-    record.el.replaceChildren(...record.children);
+  if (isCodePaintIntact(record)) record.el.replaceChildren(...record.children);
+  else
+    for (const node of record.renderedChildren) {
+      if (
+        node.parentNode === record.el &&
+        node.nodeType === 1 &&
+        (node as Element).classList.contains("cp-token")
+      )
+        (node as ChildNode).replaceWith(...Array.from(node.childNodes));
+    }
   for (const r of record.paint) {
     r.el.classList.remove(...r.classes);
     for (const [key, val, priority] of r.values) {

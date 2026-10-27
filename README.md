@@ -1,6 +1,6 @@
 # Code Palette · 代码配色
 
-v0.1 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。
+v0.1.1 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。它是 v0.1 初版的实测修订版，保留原 v0.1 标签。
 
 源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（私有仓库，需要登录有权限的 GitHub 账号）。
 
@@ -12,7 +12,7 @@ v0.1 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独�
 
 ## 安装
 
-从 v0.1 发布页下载 `code-palette-v0.1.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette · 代码配色**。
+从 v0.1.1 发布页下载 `code-palette-v0.1.1.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette · 代码配色**。更新时覆盖 main.js、manifest.json、styles.css 即可，保留自己的 data.json。
 
 ## 使用
 
@@ -24,7 +24,7 @@ v0.1 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独�
 
 Node.js 22+。运行 `npm ci`，再运行 `npm run check`。`npm run build` 在根目录生成 `main.js`；`npm run package` 生成安装包。单独修改 `data.json` 或主题配置不需要更改任何笔记。
 
-手机端预留兼容；v0.1 的实际验收以 Windows 桌面版为准。TextMate 语法高亮不包含语言服务器提供的语义着色。
+手机端预留兼容；v0.1.1 的实际验收以 Windows 桌面版为准。TextMate 语法高亮不包含语言服务器提供的语义着色。
 
 单段代码超过 200,000 个字符时回退原显示，避免大段同步分词阻塞编辑器。语法高亮只为可识别的词元着色，普通变量和不完整片段不一定呈现多种颜色。修改已有规则后会刷新已打开的阅读／编辑视图。
 
