@@ -1,70 +1,64 @@
-# Code Palette
+# 🎨 Code Palette
 
-[简体中文](README.md) · [English](README.EN.md)
+[English](README.EN.md) · [下载 ZIP](https://github.com/Tillerion/obsidian-code-palette/releases/latest) · [社区页面](https://community.obsidian.md/plugins/code-palette)
 
-## English overview
+为 Obsidian 的行内代码、表格代码和代码块选择独立配色。按文件或文件夹设置默认语言，让学习笔记中的短代码也能获得语法高亮，笔记原文保持不变。
 
-Code Palette adds independent syntax highlighting themes to inline code and ordinary code blocks in Obsidian. Set a default language for a file, a folder and its subfolders, or the vault. Existing language labels are preserved. The optional global palette mode themes code throughout the vault without inferring a language for unlabelled snippets. It bundles 24 languages and 10 themes for offline use, supports reading, live preview and source views, and keeps Markdown content unchanged. See the [English guide](README.EN.md) for setup and usage.
+**English:** Code Palette brings independent code themes to inline code, tables and code blocks in Obsidian. Set a default language for a file or folder, or enable a vault-wide palette without language guessing. Existing code-block language labels are preserved. It includes 24 languages and 10 offline themes, supports reading and editing views, and keeps your Markdown content unchanged. See the [English guide](README.EN.md) for installation and usage.
 
-## 中文简介
+## ✨ 功能
 
-v0.1.4 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。本次修正社区审核与发布流程；保留 v0.1.2 的可选全局配色功能和原有配置。历史版本标签保留。
+- **范围规则：** 按文件、文件夹及子文件夹设置默认语言，也可设置仓库默认规则。
+- **多语言高亮：** 内置 Python、C/C++、Java、JavaScript/TypeScript、SQL 等 24 种常用语言，保留代码块已有语言标记。
+- **独立配色：** 10 套离线主题，包括 One Dark Pro、VS Code Dark+/Light+、GitHub、Dracula、Nord 等；可固定配色或跟随明暗模式。
+- **全局代码配色：** 无需设置语言规则，统一仓库内普通代码的外观。无标记代码只使用主题基础文字色与背景色，不猜测语言。
+- **阅读与编辑：** 支持阅读、实时预览和源码模式；只调整代码区域，正文与 Markdown 内容不变。
 
-源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（公有仓库）。
+## 📦 安装与更新
 
-- 文件、文件夹（可递归）和仓库默认语言；文件规则优先于最近的文件夹规则。
-- 🎨 全局代码配色：只沿用代码块已有语言，无标记代码不匹配、不猜测语言。
-- 保留代码块已有的语言；支持 Python、C/C++、Java 等常用语言。
-- 10 套离线代码配色；默认深色 One Dark Pro、浅色 VS Code Light+。
-- 阅读视图、实时预览和源码模式；正文及 Obsidian 界面不受配色影响。
-- 笔记原文保持不变，规则存放于插件 data.json。
+### ZIP 安装
 
-## 安装
+1. 从 [最新发布](https://github.com/Tillerion/obsidian-code-palette/releases/latest) 下载 ZIP 安装包，**不要下载 GitHub 自动生成的 Source code ZIP**。
+2. 解压，将 `code-palette` 文件夹放入笔记仓库的 `.obsidian/plugins/`。
+3. 在 Obsidian → 设置 → 第三方插件中启用 **Code Palette**。
 
-从 [0.1.4 发布页](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4) 下载 `main.js`、`manifest.json`、`styles.css`，放入仓库的 `.obsidian/plugins/code-palette/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖这三个文件，保留自己的 `data.json`。本地执行 `npm run package` 仍可生成 ZIP；社区正式发布只附加三个安装文件。
+```text
+你的笔记仓库/
+└─ .obsidian/plugins/code-palette/
+   ├─ main.js
+   ├─ manifest.json
+   └─ styles.css
+```
 
-社区安装对应的正式发布标签为 [`0.1.4`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。历史发布保留。
+**已有版本更新：** 暂停插件，将 ZIP 中的 `main.js`、`manifest.json`、`styles.css` 覆盖到原目录，再重新启用。保留现有 `data.json`，即可保留语言规则和配色设置。从 0.1.2 更新到 0.1.4 也适用。
 
-## 使用
+### 插件市场
 
-### 🎨 全局代码配色（不匹配语言）
+在 Obsidian → 设置 → 第三方插件 → 浏览中搜索 **Code Palette**。已被应用内目录收录后，可使用“检查更新”升级。
 
-在插件设置中开启 **全局代码配色（不匹配语言）**，即可将当前选择的配色应用于整个仓库的行内代码和普通代码块，无需新增任何语言规则。
+新插件在社区网站通过审核后，同步到应用内目录可能需要最多 24 小时；如暂时搜不到或检查不到更新，请先使用 ZIP 安装。参见 [Obsidian 官方说明](https://obsidian.md/blog/future-of-plugins/#how-do-i-submit-a-new-plugin-or-theme)。
 
-- 已有 `java`、`cpp` 等语言标记：沿用原语言，采用插件配色。
-- 行内代码、无标记代码块，以及暂不支持的语言：只应用主题的基础文字色和背景色，不猜测语言、不进行额外语法着色。
-- 当前文字／背景选项仍然有效，Mermaid、Dataview 等功能块继续使用原处理。
-- 全局模式默认关闭；开启后暂不使用文件／文件夹／仓库默认语言规则，关闭后恢复原规则。总开关仍能暂停所有插件效果。
-- 只调整显示，不修改 Markdown 内容。
+## 🚀 使用
 
-**Global palette (no language inference):** Enable this option in the plugin settings to theme ordinary code throughout the vault without assigning language rules. Labelled fences retain their language; inline code, unlabelled fences and unsupported languages receive plain theme foreground/background colors only. This mode temporarily bypasses saved language rules; turning it off restores them. Functional blocks remain untouched and note contents are preserved.
+**按语言高亮：** 保持“全局代码配色”关闭。右键文件或文件夹 → **代码配色：设置语言规则** → 选择 Python、C++、Java 等默认语言。行内代码和无语言标记的普通代码块使用该语言；已有语言标记保持优先。规则优先级为：文件 → 最近的文件夹 → 上级文件夹 → 仓库默认。
 
-### 文件或文件夹语言规则
+**只统一配色：** 在插件设置中打开 **全局代码配色（不匹配语言）**。已有语言标记的代码块保留语法高亮；行内代码和无标记块只应用基础文字色与背景色。此模式暂时绕过语言规则，关闭后恢复。
 
-右键文件或文件夹 → **代码配色：设置语言规则**，选择默认语言。已有 `java`、`cpp` 等标记的代码块继续使用原语言，但采用插件选定的代码主题。到插件设置中选择深浅配色、预览高亮、管理规则。全局模式关闭时，未设置规则的笔记默认不受影响；可在设置中启用仓库默认规则。
+**选择主题：** 在插件设置中调整固定配色、深浅模式和代码背景。总开关可随时暂停显示效果，设置仍会保留。
 
-`text` / `txt` / `plain` 表示明确的纯文本；Mermaid、Dataview 等专用功能块保持其原有渲染。不支持的语言在规则模式下回退原显示，在全局模式下使用基础配色。
+## 🖼️ 效果示例
 
-## 开发
+阅读视图示例（截图来自 v0.1.1）：
 
-Node.js 22+。运行 `npm ci`，再运行 `npm run check`。`npm run build` 在根目录生成 `main.js`；`npm run package` 生成安装包。单独修改 `data.json` 或主题配置不需要更改任何笔记。
+![表格行内代码与代码块高亮示例](docs/screenshots/v0.1.1-reading.png)
 
-发布到 Obsidian 社区时，GitHub Release 标签必须等于清单版本（例如 `0.1.2`），并直接附加同次构建的 `main.js`、`manifest.json`、`styles.css`，不能只上传 ZIP。
+## 使用说明
 
-手机端预留兼容；历史 v0.1.1 在 Windows 桌面版实测。本轮 v0.1.2 仅做后台自动化验证，未进行前台实测。TextMate 语法高亮不包含语言服务器提供的语义着色。
+- 要求 Obsidian 1.8.0 或更新版本；移动端尚未完成实测。
+- Mermaid、Dataview 等专用功能块保持原处理；`text` 等纯文本标记不会被当成编程语言。
+- 提供语法高亮，不提供代码执行或语言服务器语义着色；普通标识符不一定呈现多种颜色。
+- 单段代码超过 200,000 字符时保留原生显示。
 
-单段代码超过 200,000 个字符时回退原显示，避免大段同步分词阻塞编辑器。语法高亮只为可识别的词元着色，普通变量和不完整片段不一定呈现多种颜色。修改已有规则后会刷新已打开的阅读／编辑视图。
+## 许可与反馈
 
-验证范围和实测记录见 [docs/verification.md](docs/verification.md)。
-
-## 🖼️ 历史实测截图
-
-以下图片来自 v0.1.1 的 Windows 实测，仅展示既有阅读／源码视图
-
-![v0.1.1 阅读视图历史截图](docs/screenshots/v0.1.1-reading.png)
-
-![v0.1.1 源码模式历史截图](docs/screenshots/v0.1.1-source.png)
-
-## 许可
-
-插件代码使用 MIT 许可；捆绑的语言和主题保留各自许可，见 `THIRD_PARTY_NOTICES.md`。
+[MIT](LICENSE) · [第三方资源许可](THIRD_PARTY_NOTICES.md) · [问题反馈](https://github.com/Tillerion/obsidian-code-palette/issues)
