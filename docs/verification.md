@@ -5,8 +5,11 @@
 - 0.1.3 的 GitHub Actions 构建、31 项测试、三个附件的来源证明及核验成功；社区亦确认 `main.js` 和 `styles.css` 来源证明通过。
 - 社区扫描新增阻断项：设置分组标题不能重复插件名。0.1.4 使用通用的“高亮设置”标题。
 - 仅修改标题及版本／文档信息，不调整高亮逻辑和用户配置；本轮继续仅做后台检查及社区扫描，不操作 Obsidian 前台。
+- [0.1.4 GitHub Actions](https://github.com/Tillerion/obsidian-code-palette/actions/runs/40621294373) 执行成功：测试、类型检查、构建、三个附件的来源证明及核验通过；发布主程序的 SHA-256 与本地最终构建一致。
+- 社区分支预审和正式发布扫描均已完成；正式记录为 `0.1.4 / 629b3ce / Completed`，没有 Error，失败横幅已消失。来源证明、网络、依赖及 `main.js` 逐字节构建复现均为 Pass。
+- 报告仍保留 DOM 帮助方法、新设置搜索接口、CSS 兼容性／优先级和文件列表枚举等 Warning/Recommendation；本轮不宣称所有建议均已清除。
 
-**English:** The 0.1.3 hosted build, tests and asset attestations succeeded, but the community scanner rejected a settings heading that repeated the plugin name. Version 0.1.4 uses a generic heading. Highlighting behavior and saved settings are unchanged; no foreground Obsidian tests were performed.
+**English:** The 0.1.3 hosted build, tests and asset attestations succeeded, but the community scanner rejected a settings heading that repeated the plugin name. Version 0.1.4 uses a generic heading. Its hosted release workflow succeeded, and the community scan is Completed with no Error findings. Asset attestations, network/dependency checks and byte-for-byte build reproduction passed. Advisory findings remain. Highlighting behavior and saved settings are unchanged; no foreground Obsidian tests were performed.
 
 ## 0.1.3：社区审核修复，2026-10-28
 
