@@ -147,7 +147,7 @@ export class RuleModal extends Modal {
     new Setting(el)
       .setName("已有代码块语言")
       .setDesc(
-        "选择替换后，所有普通代码块均按上方指定的语言高亮，包括 text；只改变显示，功能块不受影响。",
+        "普通代码块使用上方指定语言，包括 text。替换为 Markdown 时，在阅读和实时预览中渲染为正文；不改写原文，功能块不受影响。",
       )
       .addDropdown((d) =>
         d

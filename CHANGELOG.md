@@ -1,5 +1,11 @@
 # 更新记录
 
+## 0.2.1
+
+- 修正 Markdown 替换：阅读与实时预览显示 Markdown 正文，源码模式保留原文；实时预览双击可编辑。
+- 全局配色仅对未匹配规则的笔记生效，保留文件／文件夹／仓库规则及禁用范围。
+- **English:** Render Markdown replacement blocks as body content and use global palette only as a fallback for unmatched notes.
+
 ## 0.2.0
 
 - ✨ 新增已有代码块语言“保留／替换”策略，支持文件、文件夹和仓库默认规则。

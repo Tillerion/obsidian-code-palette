@@ -88,7 +88,7 @@ test("existing-language policy survives settings reload and safely defaults for 
   }
 });
 
-test("language replacement follows the selected scope and resumes after global palette is disabled", () => {
+test("language replacement follows the selected scope even while global palette is enabled", () => {
   const s = normalizeSettings({
     rules: [
       rule("folder", "docs", "markdown", { existingLanguage: "replace" }),
@@ -100,19 +100,22 @@ test("language replacement follows the selected scope and resumes after global p
   assert.equal(resolveRule("docs/keep.md", s)?.existingLanguage, "preserve");
   assert.equal(resolveRule("elsewhere.md", s)?.existingLanguage, "replace");
   s.globalPalette = true;
-  assert.equal(resolveRule("docs/sub/note.md", s)?.paletteOnly, true);
+  assert.equal(resolveRule("docs/sub/note.md", s)?.paletteOnly, undefined);
+  assert.equal(resolveRule("docs/sub/note.md", s)?.existingLanguage, "replace");
+  assert.equal(resolveRule("docs/keep.md", s)?.existingLanguage, "preserve");
+  assert.equal(resolveRule("elsewhere.md", s)?.language, "python");
   s.globalPalette = false;
   assert.equal(resolveRule("docs/sub/note.md", s)?.existingLanguage, "replace");
 });
 
-test("global palette bypasses saved language rules and restores them when disabled", () => {
+test("global palette is fallback only and respects explicit exclusions and the master switch", () => {
   const s = defaultSettings();
   s.rules = [rule("file", "note.md", "cpp", { enabled: false })];
   s.globalPalette = true;
   const global = resolveRule("note.md", s);
-  assert.equal(global?.enabled, true);
-  assert.equal(global?.language, "text");
-  assert.equal(global?.paletteOnly, true);
+  assert.equal(global?.enabled, false);
+  assert.equal(global?.language, "cpp");
+  assert.equal(global?.paletteOnly, undefined);
   assert.equal(resolveRule("unconfigured/deep/note.md", s)?.paletteOnly, true);
   assert.equal(s.rules[0].enabled, false);
   assert.equal(s.rules[0].language, "cpp");
@@ -122,6 +125,29 @@ test("global palette bypasses saved language rules and restores them when disabl
   s.globalPalette = true;
   s.enabled = false;
   assert.equal(resolveRule("note.md", s), null);
+});
+
+test("global palette preserves folder boundaries, recursion and per-rule code type switches", () => {
+  const s = normalizeSettings({
+    globalPalette: true,
+    rules: [
+      rule("folder", "docs", "markdown", {
+        existingLanguage: "replace",
+        recursive: false,
+        inline: false,
+      }),
+      rule("folder", "docs/sub", "java", { blocks: false }),
+      rule("file", "docs/sub/disabled.md", "python", { enabled: false }),
+    ],
+  });
+  assert.equal(resolveRule("docs/direct.md", s)?.language, "markdown");
+  assert.equal(resolveRule("docs/direct.md", s)?.inline, false);
+  assert.equal(resolveRule("docs/direct.md", s)?.existingLanguage, "replace");
+  assert.equal(resolveRule("docs/sub/note.md", s)?.blocks, false);
+  assert.equal(resolveRule("docs/sub/disabled.md", s)?.enabled, false);
+  assert.equal(resolveRule("docs/other/note.md", s)?.paletteOnly, true);
+  assert.equal(resolveRule("docs-other/note.md", s)?.paletteOnly, true);
+  assert.equal(resolveRule("unmatched.md", s)?.paletteOnly, true);
 });
 test("global palette never supplies or guesses a language for unlabelled code", () => {
   assert.equal(chooseLanguage("", "python", true), "text");

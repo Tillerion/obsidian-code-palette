@@ -1,6 +1,6 @@
 {
   "name": "obsidian-code-palette",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Obsidian 文件与文件夹代码语言规则和独立代码配色",
   "type": "module",

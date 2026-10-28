@@ -1,5 +1,19 @@
 # 验证记录
 
+## 0.2.1：Markdown 正文预览与全局配色优先级
+
+日期：2026-10-28。Windows、Node.js 24.21.0、Obsidian 1.14.5。
+
+- 42 项后台测试、类型检查和生产构建通过。新增 Markdown 正文、光标编辑、源码模式、异步取消、失败回退、组件释放和全局兜底优先级回归。
+- 在已运行的 Obsidian 中备份三个安装文件后，通过 CLI 后台重载 0.2.1；未切换用户笔记、未模拟鼠标操作。
+- 原生 MarkdownRenderer 与真实插件阅读后处理器验证：`text` 块生成标题、粗体、两项列表和表格；嵌套普通代码保留，Mermaid 围栏不被替换。全局配色开启时，文件夹规则仍渲染 Markdown 正文。
+- 在同一 Obsidian Electron 环境内创建离屏 CodeMirror 6 编辑器，使用实际插件扩展与原生 MarkdownRenderer，验证正文预览、光标进入编辑、移出恢复、源码模式保留围栏及切回“保留”策略。未对用户当前编辑器执行交互。
+- 阅读及编辑器探针均确认源字符串不变、渲染组件和订阅完成清理、没有报告错误；安装前后规则配置 SHA-256 相同。
+- 独立静态复审未发现发布阻断问题。真实设置页点击、前台视觉布局、手机端和其他渲染插件组合未在本轮验证。
+- GitHub 托管构建、附件来源证明和社区扫描结果以对应公开发布记录为准。
+
+**English:** All 42 background tests, type checking and the production build passed. The native Obsidian renderer and plugin reading postprocessor produced actual Markdown headings, bold text, lists and a table. An offscreen CM6 editor in the same Electron process verified preview/edit/source transitions using the real extension and native renderer. Global palette respected matched rules. Source strings and saved settings were preserved, and render resources were released without reported errors. Static review found no release blockers. Foreground layout, settings clicks, mobile and third-party renderer combinations were not tested.
+
 ## 0.2.0：已有代码块语言替换
 
 - 35 项后台自动化测试、TypeScript 类型检查、生产构建和 Windows ZIP 打包通过。

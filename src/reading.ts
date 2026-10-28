@@ -1,5 +1,5 @@
-import type { PaletteHost } from "./host";
-import { chooseLanguage, resolveRule } from "./rules";
+import type { PaletteHost, MarkdownRenderHandle } from "./host";
+import { chooseLanguage, resolveRule, rendersMarkdownBody } from "./rules";
 import {
   applyCode,
   restoreCode,
@@ -7,9 +7,21 @@ import {
   type CodeRecord,
 } from "./rendering";
 const owners = new WeakMap<HTMLElement, ReadingController>();
+export function readingRoot(el: HTMLElement): HTMLElement {
+  return el.tagName === "PRE" || el.tagName === "CODE"
+    ? (el.closest("pre")?.parentElement ?? el)
+    : el;
+}
+interface MarkdownRecord {
+  code: HTMLElement;
+  pre: HTMLElement;
+  preview: HTMLElement;
+  handle: MarkdownRenderHandle;
+}
 
 export class ReadingController {
   private records: CodeRecord[] = [];
+  private markdownRecords: MarkdownRecord[] = [];
   private generation = 0;
   private disposed = false;
   private unsubscribe: () => void;
@@ -21,6 +33,7 @@ export class ReadingController {
     private path: string | (() => string),
     private host: PaletteHost,
   ) {
+    this.root = root = readingRoot(root);
     this.window = root.ownerDocument.defaultView ?? window;
     const Observer = root.ownerDocument.defaultView?.MutationObserver;
     if (Observer) {
@@ -50,6 +63,7 @@ export class ReadingController {
     await Promise.all(
       codes.map(async (code) => {
         if (owners.has(code)) return;
+        if (code.closest(".cp-markdown-preview")) return;
         // An enclosing note's postprocessor must not take over its embedded notes.
         const embed = code.closest(".internal-embed");
         if (embed && this.root.contains(embed) && embed !== this.root) return;
@@ -74,6 +88,39 @@ export class ReadingController {
         );
         if (!lang) return;
         const text = code.textContent ?? "";
+        if (
+          block &&
+          !!code.parentElement?.parentNode &&
+          text.length <= 200_000 &&
+          rendersMarkdownBody(rule, explicit) &&
+          this.host.renderMarkdown
+        ) {
+          let record: MarkdownRecord | undefined;
+          try {
+            const preview = code.ownerDocument
+              .createDocumentFragment()
+              .createEl("div", {
+                cls: "cp-markdown-preview markdown-rendered",
+                attr: {
+                  "data-language": "markdown",
+                  "aria-label": "Markdown 正文预览",
+                },
+              });
+            const handle = this.host.renderMarkdown(text, preview, path);
+            record = { code, pre: code.parentElement!, preview, handle };
+            this.markdownRecords.push(record);
+            owners.set(code, this);
+            this.withoutObservation(() => record!.pre.replaceWith(preview));
+            await handle.ready;
+            return;
+          } catch (error) {
+            if (record)
+              this.withoutObservation(() => this.restoreMarkdown(record!));
+            if (this.disposed || generation !== this.generation) return;
+            this.host.reportError(error);
+            // Preserve an editable code block if native Markdown rendering fails.
+          }
+        }
         try {
           const result = await this.host.highlighter.highlight(
             text,
@@ -120,6 +167,8 @@ export class ReadingController {
   }
   private release() {
     this.withoutObservation(() => {
+      for (const record of [...this.markdownRecords])
+        this.restoreMarkdown(record);
       for (const record of this.records) {
         if (owners.get(record.el) === this) {
           owners.delete(record.el);
@@ -128,6 +177,16 @@ export class ReadingController {
       }
       this.records = [];
     });
+  }
+  private restoreMarkdown(record: MarkdownRecord) {
+    const index = this.markdownRecords.indexOf(record);
+    if (index < 0) return;
+    this.markdownRecords.splice(index, 1);
+    record.handle.dispose();
+    if (owners.get(record.code) === this) {
+      owners.delete(record.code);
+      if (record.preview.parentNode) record.preview.replaceWith(record.pre);
+    }
   }
   private observe() {
     if (!this.disposed)
@@ -155,11 +214,13 @@ export class ReadingController {
         mutation.target.nodeType === 1
           ? (mutation.target as Element)
           : mutation.target.parentElement;
+      if (target?.closest(".cp-markdown-preview")) continue;
       const code = target?.closest<HTMLElement>("code");
       if (code) candidates.add(code);
       for (const node of mutation.addedNodes)
         if (node.nodeType === 1) {
           const element = node as HTMLElement;
+          if (element.closest(".cp-markdown-preview")) continue;
           if (element.tagName === "CODE") candidates.add(element);
           for (const child of element.querySelectorAll<HTMLElement>("code"))
             candidates.add(child);
@@ -171,7 +232,9 @@ export class ReadingController {
         if (owner && owner !== this) return false;
         const record = this.records.find((r) => r.el === code);
         return !record || !isCodePaintIntact(record);
-      }) || this.records.some((r) => !this.root.contains(r.el));
+      }) ||
+      this.records.some((r) => !this.root.contains(r.el)) ||
+      this.markdownRecords.some((r) => !this.root.contains(r.preview));
     if (changed && this.timer === undefined)
       this.timer = this.window.setTimeout(() => void this.refresh(), 0);
   }

@@ -7,6 +7,9 @@ import {
   TFolder,
   editorInfoField,
   type MarkdownPostProcessorContext,
+  Component,
+  MarkdownRenderer,
+  editorLivePreviewField,
 } from "obsidian";
 import { Highlighter } from "./highlighter";
 import {
@@ -20,7 +23,7 @@ import {
   type Rule,
 } from "./rules";
 import { createEditorExtension } from "./editor";
-import { ReadingController } from "./reading";
+import { ReadingController, readingRoot } from "./reading";
 import { PaletteSettings } from "./settings";
 import { RuleModal, ThemePicker } from "./modals";
 import { languageName, themeName } from "./catalog";
@@ -52,6 +55,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
       createEditorExtension(
         this,
         (state) => state.field(editorInfoField, false)?.file?.path ?? "",
+        (state) => state.field(editorLivePreviewField, false) ?? false,
       ),
     );
     this.registerMarkdownPostProcessor((el, ctx) =>
@@ -193,7 +197,9 @@ export default class CodePalette extends Plugin implements PaletteHost {
       }
   }
   private processReading(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
+    if (el.closest(".cp-markdown-preview")) return;
     if (!el.querySelector("code") && el.tagName !== "CODE") return;
+    el = readingRoot(el);
     this.observeDocument(el.ownerDocument);
     class PaletteChild extends MarkdownRenderChild {
       private controller?: ReadingController;
@@ -225,6 +231,29 @@ export default class CodePalette extends Plugin implements PaletteHost {
       this.settings,
       doc.body.classList.contains("theme-dark"),
     );
+  }
+  renderMarkdown(source: string, container: HTMLElement, path: string) {
+    const component = new Component();
+    this.addChild(component);
+    let disposed = false;
+    const ready = Promise.resolve().then(async () => {
+      if (!disposed)
+        await MarkdownRenderer.render(
+          this.app,
+          source,
+          container,
+          path,
+          component,
+        );
+    });
+    return {
+      ready,
+      dispose: () => {
+        if (disposed) return;
+        disposed = true;
+        this.removeChild(component);
+      },
+    };
   }
   subscribe(callback: () => void) {
     this.listeners.add(callback);

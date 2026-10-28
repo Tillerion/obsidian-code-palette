@@ -1,4 +1,18 @@
 /* All visual overrides are scoped to plugin-managed code or its settings. */
+.cp-markdown-preview {
+  white-space: normal;
+  font-family: var(--font-text);
+  line-height: var(--line-height-normal);
+}
+.cp-markdown-preview > :first-child {
+  margin-top: 0;
+}
+.cp-markdown-preview > :last-child {
+  margin-bottom: 0;
+}
+.cm-content .cp-markdown-preview {
+  padding: 8px 0;
+}
 .cp-code {
   color: var(--cp-fg) !important;
 }

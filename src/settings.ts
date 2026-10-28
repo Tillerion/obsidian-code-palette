@@ -47,7 +47,7 @@ export class PaletteSettings extends PluginSettingTab {
     new Setting(el)
       .setName("全局代码配色（不匹配语言）")
       .setDesc(
-        "为整个仓库的行内代码和普通代码块使用所选配色。只沿用代码块已有的语言标记；没有标记或暂不支持的语言仅应用基础文字色和背景色，不猜测语言。开启后暂不使用下面的语言规则，关闭后恢复。",
+        "仅为未匹配语言规则的笔记使用所选配色，不猜测语言。文件、文件夹和仓库默认规则始终优先，已关闭的范围也不被覆盖。未匹配范围中的无标记代码只应用基础文字色和背景色。",
       )
       .addToggle((t) =>
         t.setValue(this.plugin.settings.globalPalette).onChange(async (v) => {
@@ -158,7 +158,7 @@ export class PaletteSettings extends PluginSettingTab {
       new Setting(el)
         .setName("已有代码块语言")
         .setDesc(
-          "仓库默认规则可保留已有标记，或统一按仓库默认语言显示。功能块不受影响；全局配色模式下不使用语言规则。",
+          "可保留已有标记，或按仓库默认语言显示；替换为 Markdown 时按正文渲染。功能块不受影响，全局配色开启时本规则仍优先。",
         )
         .addDropdown((d) =>
           d

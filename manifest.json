@@ -1,9 +1,9 @@
 {
   "id": "code-palette",
   "name": "Code Palette",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "minAppVersion": "1.8.0",
-  "description": "Apply independent code themes, preserve or override code-block languages with file or folder rules, and enable a vault-wide palette without language guessing.",
+  "description": "Theme code with file or folder language rules, render Markdown replacement blocks as body content, and use a global palette for unmatched notes.",
   "author": "Skrch",
   "isDesktopOnly": false
 }

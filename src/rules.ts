@@ -52,18 +52,6 @@ export function resolveRule(
   settings: Settings,
 ): (Rule & { source: string; paletteOnly?: boolean }) | null {
   if (!settings.enabled) return null;
-  if (settings.globalPalette)
-    return {
-      kind: "folder",
-      path: "",
-      enabled: true,
-      language: "text",
-      inline: true,
-      blocks: true,
-      recursive: true,
-      source: "全局代码配色（不匹配语言）",
-      paletteOnly: true,
-    };
   path = cleanPath(path);
   const file = settings.rules.find((r) => r.kind === "file" && r.path === path);
   if (file) return { ...file, source: `文件：${file.path}` };
@@ -77,8 +65,20 @@ export function resolveRule(
   folders.sort((a, b) => b.path.length - a.path.length);
   if (folders[0])
     return { ...folders[0], source: `文件夹：${folders[0].path || "/"}` };
-  return settings.defaultRule
-    ? { ...settings.defaultRule, source: "仓库默认规则" }
+  if (settings.defaultRule)
+    return { ...settings.defaultRule, source: "仓库默认规则" };
+  return settings.globalPalette
+    ? {
+        kind: "folder",
+        path: "",
+        enabled: true,
+        language: "text",
+        inline: true,
+        blocks: true,
+        recursive: true,
+        source: "全局代码配色（不匹配语言）",
+        paletteOnly: true,
+      }
     : null;
 }
 export function chooseLanguage(
@@ -92,6 +92,19 @@ export function chooseLanguage(
   if (paletteOnly) return id ? (canonicalLanguage(id) ?? "text") : "text";
   if (existingLanguage === "replace") return canonicalLanguage(fallback);
   return id ? canonicalLanguage(id) : canonicalLanguage(fallback);
+}
+export function rendersMarkdownBody(
+  rule: Rule & { paletteOnly?: boolean },
+  explicit: string,
+): boolean {
+  return (
+    rule.enabled &&
+    rule.blocks &&
+    !rule.paletteOnly &&
+    rule.existingLanguage === "replace" &&
+    chooseLanguage(explicit, rule.language, false, rule.existingLanguage) ===
+      "markdown"
+  );
 }
 export function moveRules(
   rules: Rule[],

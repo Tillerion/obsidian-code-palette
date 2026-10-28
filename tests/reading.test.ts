@@ -13,6 +13,243 @@ async function until(check: () => boolean) {
   }
 }
 
+test("Markdown replacement mounts rendered body, ignores nested code and restores the original block", async () => {
+  const dom = new JSDOM(
+    '<section><pre><code class="language-text"># Heading\n\n- item</code></pre><pre><code class="language-mermaid">graph LR; A--&gt;B</code></pre></section>',
+  );
+  const root = dom.window.document.querySelector("section")!;
+  const originalPre = root.querySelector("pre")!;
+  const originalCode = originalPre.querySelector("code")!;
+  const originalText = root.textContent;
+  const settings = normalizeSettings({
+    globalPalette: true,
+    rules: [
+      {
+        kind: "file",
+        path: "note.md",
+        language: "markdown",
+        existingLanguage: "replace",
+        inline: false,
+      },
+    ],
+  });
+  const highlighter = new Highlighter();
+  const listeners = new Set<() => void>();
+  let rendered = 0,
+    disposed = 0;
+  const host: PaletteHost = {
+    settings,
+    highlighter,
+    active: true,
+    revision: 0,
+    theme: () => "one-dark-pro",
+    subscribe: (f) => {
+      listeners.add(f);
+      return () => {
+        listeners.delete(f);
+      };
+    },
+    reportError: (e) => {
+      throw e;
+    },
+    renderMarkdown: (source, el, path) => {
+      assert.equal(source, "# Heading\n\n- item");
+      assert.equal(path, "note.md");
+      rendered++;
+      el.createEl("h1", { text: "Heading" });
+      el.createEl("ul").createEl("li", { text: "item" });
+      el.createEl("pre").createEl("code", {
+        cls: "language-python",
+        text: "print(1)",
+      });
+      return {
+        ready: Promise.resolve(),
+        dispose: () => {
+          disposed++;
+        },
+      };
+    },
+  };
+  const controller = new ReadingController(root, "note.md", host);
+  try {
+    await until(() => !!root.querySelector(".cp-markdown-preview h1"));
+    assert.equal(root.querySelector(".language-text"), null);
+    assert.equal(
+      root.querySelector(".cp-markdown-preview li")?.textContent,
+      "item",
+    );
+    assert.equal(root.querySelector(".language-mermaid .cp-token"), null);
+    await new Promise((r) => setTimeout(r, 40));
+    assert.equal(rendered, 1);
+    settings.rules[0].existingLanguage = "preserve";
+    listeners.forEach((f) => f());
+    await until(() => root.querySelector(".language-text") === originalCode);
+    assert.equal(root.querySelector(".cp-markdown-preview"), null);
+    assert.equal(disposed, 1);
+    controller.dispose();
+    assert.equal(root.querySelector("pre"), originalPre);
+    assert.equal(root.textContent, originalText);
+  } finally {
+    controller.dispose();
+    highlighter.dispose();
+    dom.window.close();
+  }
+});
+
+test("a cancelled Markdown render cannot reinsert its preview after the controller is disposed", async () => {
+  const dom = new JSDOM(
+    '<section><pre><code class="language-text"># Heading</code></pre></section>',
+  );
+  const root = dom.window.document.querySelector("section")!,
+    original = root.innerHTML;
+  const settings = normalizeSettings({
+    defaultRule: {
+      kind: "folder",
+      path: "",
+      language: "markdown",
+      existingLanguage: "replace",
+    },
+  });
+  const highlighter = new Highlighter();
+  let finish!: () => void,
+    disposed = 0;
+  const host: PaletteHost = {
+    settings,
+    highlighter,
+    active: true,
+    revision: 0,
+    theme: () => "nord",
+    subscribe: () => () => {},
+    reportError: (e) => {
+      throw e;
+    },
+    renderMarkdown: (_source, el) => ({
+      ready: new Promise<void>((resolve) => {
+        finish = () => {
+          el.createEl("h1", { text: "Late" });
+          resolve();
+        };
+      }),
+      dispose: () => {
+        disposed++;
+      },
+    }),
+  };
+  const controller = new ReadingController(root, "note.md", host);
+  try {
+    assert.ok(root.querySelector(".cp-markdown-preview"));
+    controller.dispose();
+    finish();
+    await Promise.resolve();
+    assert.equal(root.innerHTML, original);
+    assert.equal(disposed, 1);
+  } finally {
+    controller.dispose();
+    highlighter.dispose();
+    dom.window.close();
+  }
+});
+
+test("removing an enclosing section immediately disposes its Markdown renderer", async () => {
+  const dom = new JSDOM(
+    '<main><section><pre><code class="language-text"># Heading</code></pre></section></main>',
+  );
+  const root = dom.window.document.querySelector("main")!,
+    section = root.querySelector("section")!;
+  const settings = normalizeSettings({
+    defaultRule: {
+      kind: "folder",
+      path: "",
+      language: "markdown",
+      existingLanguage: "replace",
+    },
+  });
+  const highlighter = new Highlighter();
+  let disposed = 0;
+  const host: PaletteHost = {
+    settings,
+    highlighter,
+    active: true,
+    revision: 0,
+    theme: () => "nord",
+    subscribe: () => () => {},
+    reportError: (e) => {
+      throw e;
+    },
+    renderMarkdown: (_source, el) => {
+      el.createEl("h1", { text: "Heading" });
+      return {
+        ready: Promise.resolve(),
+        dispose: () => {
+          disposed++;
+        },
+      };
+    },
+  };
+  const controller = new ReadingController(root, "note.md", host);
+  try {
+    await until(() => !!root.querySelector("h1"));
+    section.remove();
+    await until(() => disposed === 1);
+    controller.dispose();
+    assert.equal(disposed, 1);
+  } finally {
+    controller.dispose();
+    highlighter.dispose();
+    dom.window.close();
+  }
+});
+
+test("a PRE postprocessor root remains managed when the original PRE is replaced", async () => {
+  const dom = new JSDOM(
+    '<section><pre><code class="language-text"># Heading</code></pre></section>',
+  );
+  const root = dom.window.document.querySelector("section")!,
+    pre = root.querySelector("pre")!;
+  const settings = normalizeSettings({
+    defaultRule: {
+      kind: "folder",
+      path: "",
+      language: "markdown",
+      existingLanguage: "replace",
+    },
+  });
+  const highlighter = new Highlighter();
+  let disposed = 0;
+  const host: PaletteHost = {
+    settings,
+    highlighter,
+    active: true,
+    revision: 0,
+    theme: () => "nord",
+    subscribe: () => () => {},
+    reportError: (e) => {
+      throw e;
+    },
+    renderMarkdown: (_source, el) => {
+      el.createEl("h1", { text: "Heading" });
+      return {
+        ready: Promise.resolve(),
+        dispose: () => {
+          disposed++;
+        },
+      };
+    },
+  };
+  const controller = new ReadingController(pre, "note.md", host);
+  try {
+    await until(() => !!root.querySelector("h1"));
+    assert.equal(root.querySelector("pre"), null);
+    controller.dispose();
+    assert.equal(root.querySelector("pre"), pre);
+    assert.equal(disposed, 1);
+  } finally {
+    controller.dispose();
+    highlighter.dispose();
+    dom.window.close();
+  }
+});
+
 test("text-labelled blocks can render as Markdown and restore their original language and DOM", async () => {
   const d = new JSDOM(
       '<section><pre><code class="language-text"># Heading\n\n**bold** and [link](https://example.com)</code></pre><pre><code class="language-mermaid">graph LR; A --&gt; B</code></pre></section>',
@@ -64,7 +301,7 @@ test("text-labelled blocks can render as Markdown and restore their original lan
     assert.equal(root.textContent, originalText);
     settings.globalPalette = true;
     refresh();
-    await until(() => colors().size === 1);
+    await until(() => colors().size > 1);
     settings.globalPalette = false;
     refresh();
     await until(() => colors().size > 1);
@@ -149,15 +386,6 @@ test("global palette themes all ordinary code but only labelled blocks get langu
     settings = defaultSettings(),
     listeners = new Set<() => void>();
   settings.globalPalette = true;
-  settings.defaultRule = {
-    kind: "folder",
-    path: "",
-    language: "python",
-    enabled: true,
-    inline: true,
-    blocks: true,
-    recursive: true,
-  };
   const host: PaletteHost = {
     highlighter: h,
     settings,
@@ -193,11 +421,7 @@ test("global palette themes all ordinary code but only labelled blocks get langu
     assert.equal(root.textContent, text);
     settings.globalPalette = false;
     listeners.forEach((f) => f());
-    await until(() => colors("inline").size > 1);
-    assert.equal(
-      root.querySelector("#unknown")!.classList.contains("cp-code"),
-      false,
-    );
+    await until(() => root.querySelectorAll(".cp-code").length === 0);
     assert.equal(root.textContent, text);
   } finally {
     controller.dispose();
