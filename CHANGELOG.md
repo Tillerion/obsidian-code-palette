@@ -1,5 +1,10 @@
 # 更新记录
 
+## 0.1.4
+
+- 🛠️ 设置页使用通用标题“高亮设置”，修正 0.1.3 社区扫描新增的插件名重复错误。
+- **English:** Replace the plugin-name settings heading with a generic heading, resolving the additional blocking scanner finding. Includes all 0.1.3 fixes.
+
 ## 0.1.3
 
 - 🛠️ 修正设置页标题接口、所属窗口计时器、异步选择回调类型、DOM 创建及快照类型。

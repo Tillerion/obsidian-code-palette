@@ -1,6 +1,6 @@
 # 🎬 Code Palette — 宣传视频制作简报 / Demo Video Brief
 
-> 面向 Claude Code / Opus 5.5 的制作交接。先读第 1–3 节，再按第 4–7 节准备和录制；英文摘要见第 10 节。功能介绍基于 **0.1.2**；当前补丁 **0.1.3** 修正社区审核与发布流程，功能及分镜保持适用。录制时使用最新清单版本作为版本字幕。
+> 面向 Claude Code / Opus 5.5 的制作交接。先读第 1–3 节，再按第 4–7 节准备和录制；英文摘要见第 10 节。功能介绍基于 **0.1.2**；当前补丁 **0.1.4** 修正社区审核与发布流程，功能及分镜保持适用。录制时使用最新清单版本作为版本字幕。
 
 ## 1. 30 秒理解项目 / Quick context
 
@@ -11,9 +11,9 @@
 | 项目事实 | 内容 |
 | --- | --- |
 | 名称 / 插件 ID | Code Palette / `code-palette` |
-| 当前版本 | `manifest.json`：`0.1.3` |
+| 当前版本 | `manifest.json`：`0.1.4` |
 | 公开源码 | [Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette) |
-| 正式发布 | [Release 0.1.3](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3)，标签没有 `v` 前缀 |
+| 正式发布 | [Release 0.1.4](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4)，标签没有 `v` 前缀 |
 | 安装文件 | Release 提供 `main.js`、`manifest.json`、`styles.css`；ZIP 可在本地构建 |
 | 运行环境 | Obsidian；清单最低版本 `1.8.0`；历史桌面实测版本 `1.14.5` |
 | 开发环境 | Node.js ≥ 22；TypeScript、Shiki、CodeMirror 6 |
@@ -22,7 +22,7 @@
 ### 可直接交给 Claude Code 的任务提示词
 
 ```text
-请阅读本仓库 DEMO_BRIEF.md，基于当前 Code Palette 0.1.3 制作宣传演示视频。
+请阅读本仓库 DEMO_BRIEF.md，基于当前 Code Palette 0.1.4 制作宣传演示视频。
 默认制作约 120 秒、1920×1080、30 fps、中文旁白和中文字幕的横屏成片。
 以真实 Obsidian 画面展示表格行内代码、文件夹规则、独立主题、多语言保留、全局配色及三种视图。
 重点遵守第 3 节的两种模式区别：全局配色不会猜测未标注代码的语言。
@@ -95,7 +95,7 @@ npm run build
 | `npm run dev` | 监听源码并重新构建；不会打开 Obsidian，也不会自动部署到演示库 |
 | `npm test` | 后台自动化测试 |
 | `npm run check` | 测试和生产构建 |
-| `npm run package` | 检查后生成 `dist/code-palette-v0.1.3.zip` |
+| `npm run package` | 检查后生成 `dist/code-palette-v0.1.4.zip` |
 
 本项目没有 `npm start` 或 localhost 预览地址。不要为录视频改造成网页。
 
@@ -122,7 +122,7 @@ Copy-Item -LiteralPath (Join-Path $repoPath 'examples\代码配色演示.md') -D
 $demoVault
 ```
 
-`work` 是此本地交接目录的素材暂存位置；在其他机器可以把 `$demoVault` 改为任意明确的独立目录。检查复制后的 `manifest.json` 确实是 `0.1.3`。
+`work` 是此本地交接目录的素材暂存位置；在其他机器可以把 `$demoVault` 改为任意明确的独立目录。检查复制后的 `manifest.json` 确实是 `0.1.4`。
 
 在 Obsidian 库选择器中选择“打开本地仓库”，打开上述路径；由操作者处理首次信任提示，再到设置 → 第三方插件启用 **Code Palette**。进入插件设置确认版本。现有 `CodePalette-TestVault` 是历史验收库，不能默认它已经安装当前版本。
 
@@ -224,7 +224,7 @@ public class Demo {
 | 70–92 | 恢复 One Dark Pro。打开“全局代码配色（不匹配语言）”，切到 `全局/无规则.md`；先圈出显式 Java 的多色词元，再圈出无标记块的基础配色。最后短切 Python 页，关闭全局模式，展示原规则恢复。 | “也可以一键统一整个库的代码配色。已有语言照常高亮；没有标记的代码只换基础颜色，不猜语言。关闭全局模式，原来的语言规则继续生效。” / **全局统一外观 · 无标记代码不推断语言** |
 | 92–105 | 在规则恢复后的主示例中切换阅读、实时预览、源码模式，保持同一段代码可见；源码保留反引号和围栏。叠加实际完成的哈希比对结果，避免铺满终端。 | “阅读、实时预览和源码模式都能使用。改变显示，保留 Markdown 原文。” / **三种视图 · 原文不变** |
 | 105–113 | 暂停总开关，展示原生效果，再重新开启。若节奏太紧，只保留重新开启后的清晰画面；用字幕补充离线语言与主题。 | “需要时随时暂停，设置依然保留。常用语言和主题资源随插件提供。” / **随时暂停 · 离线高亮** |
-| 113–120 | 干净的示例笔记定格，叠加名称、GitHub 仓库和版本。网址至少可读 3 秒。 | “Code Palette，让学习笔记里的代码，更清晰，也更合你的审美。” / **开源 · Code Palette 0.1.3** |
+| 113–120 | 干净的示例笔记定格，叠加名称、GitHub 仓库和版本。网址至少可读 3 秒。 | “Code Palette，让学习笔记里的代码，更清晰，也更合你的审美。” / **开源 · Code Palette 0.1.4** |
 
 ### 镜头执行补充
 
@@ -324,7 +324,7 @@ code-palette-video/
 
 ## 10. English production handoff
 
-**Product:** Code Palette 0.1.3 is a third-party plugin for Obsidian that applies independent code themes and optional language defaults to inline code and ordinary code blocks. It is an in-app plugin, with no web server or standalone preview URL.
+**Product:** Code Palette 0.1.4 is a third-party plugin for Obsidian that applies independent code themes and optional language defaults to inline code and ordinary code blocks. It is an in-app plugin, with no web server or standalone preview URL.
 
 **Default film:** About 120 seconds, 1920×1080, 30 fps, Chinese narration and captions. Use real Obsidian footage for functionality; generated titles, callouts and transitions are fine. Deliver an MP4, a synchronized SRT, final narration and production notes. These are suggested production defaults, not completed deliverables.
 
@@ -345,7 +345,7 @@ code-palette-video/
 
 **Accuracy:** Do not claim automatic language detection, LSP semantic coloring, code execution, verified mobile support, or confirmed community-directory approval. Historical screenshots demonstrate 0.1.1, not the newer global setting. Existing 0.1.2 records cover background verification; actual new footage must be checked during production. Do not fake successful UI actions or recolor tokens in post-production to simulate a feature.
 
-**Download / CTA:** [GitHub repository](https://github.com/Tillerion/obsidian-code-palette) · [Release 0.1.3](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3). The release tag matches `manifest.version` exactly and has no leading `v`.
+**Download / CTA:** [GitHub repository](https://github.com/Tillerion/obsidian-code-palette) · [Release 0.1.4](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4). The release tag matches `manifest.version` exactly and has no leading `v`.
 
 ## 11. 源码定位 / Source map
 

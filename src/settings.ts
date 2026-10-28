@@ -26,7 +26,7 @@ export class PaletteSettings extends PluginSettingTab {
     el.empty();
     el.addClass("cp-settings");
     const header = el.createDiv({ cls: "cp-settings-header" });
-    new Setting(header).setName("Code Palette").setHeading();
+    new Setting(header).setName("高亮设置").setHeading();
     header.createSpan({
       text: `v${this.plugin.manifest.version}`,
       cls: "cp-version",

@@ -4,13 +4,13 @@
 
 An Obsidian plugin for independent code color themes, optional file/folder language rules, and a vault-wide palette mode without language inference.
 
-Version **0.1.3** fixes community review and release packaging findings while preserving existing highlighting behavior and settings.
+Version **0.1.4** fixes community review and release packaging findings while preserving existing highlighting behavior and settings.
 
 ## 📦 Install or update
 
-Download `main.js`, `manifest.json` and `styles.css` from the [0.1.3 release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3). Put them in your vault's `.obsidian/plugins/code-palette/` directory, then enable **Code Palette** in Community plugins. Local `npm run package` still creates a ZIP; community releases attach only the three installation files.
+Download `main.js`, `manifest.json` and `styles.css` from the [0.1.4 release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4). Put them in your vault's `.obsidian/plugins/code-palette/` directory, then enable **Code Palette** in Community plugins. Local `npm run package` still creates a ZIP; community releases attach only the three installation files.
 
-The community-compatible release tag is exactly `0.1.3`, matching `manifest.json` without a `v` prefix. Historical releases are retained.
+The community-compatible release tag is exactly `0.1.4`, matching `manifest.json` without a `v` prefix. Historical releases are retained.
 
 For an update, disable the plugin, replace main.js, manifest.json and styles.css, keep your existing data.json, and enable it again.
 

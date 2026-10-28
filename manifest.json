@@ -1,7 +1,7 @@
 {
   "id": "code-palette",
   "name": "Code Palette",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "minAppVersion": "1.8.0",
   "description": "Apply independent themes to inline code and code blocks, with file or folder language defaults and a vault-wide palette mode that preserves existing language labels.",
   "author": "Skrch",

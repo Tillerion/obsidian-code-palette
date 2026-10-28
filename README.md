@@ -8,7 +8,7 @@ Code Palette adds independent syntax highlighting themes to inline code and ordi
 
 ## 中文简介
 
-v0.1.3 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。本次修正社区审核与发布流程；保留 v0.1.2 的可选全局配色功能和原有配置。历史版本标签保留。
+v0.1.4 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。本次修正社区审核与发布流程；保留 v0.1.2 的可选全局配色功能和原有配置。历史版本标签保留。
 
 源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（公有仓库）。
 
@@ -21,9 +21,9 @@ v0.1.3 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独
 
 ## 安装
 
-从 [0.1.3 发布页](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3) 下载 `main.js`、`manifest.json`、`styles.css`，放入仓库的 `.obsidian/plugins/code-palette/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖这三个文件，保留自己的 `data.json`。本地执行 `npm run package` 仍可生成 ZIP；社区正式发布只附加三个安装文件。
+从 [0.1.4 发布页](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4) 下载 `main.js`、`manifest.json`、`styles.css`，放入仓库的 `.obsidian/plugins/code-palette/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖这三个文件，保留自己的 `data.json`。本地执行 `npm run package` 仍可生成 ZIP；社区正式发布只附加三个安装文件。
 
-社区安装对应的正式发布标签为 [`0.1.3`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。历史发布保留。
+社区安装对应的正式发布标签为 [`0.1.4`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.4)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。历史发布保留。
 
 ## 使用
 

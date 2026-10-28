@@ -1,5 +1,13 @@
 # 验证记录
 
+## 0.1.4：实际社区扫描反馈修复，2026-10-28
+
+- 0.1.3 的 GitHub Actions 构建、31 项测试、三个附件的来源证明及核验成功；社区亦确认 `main.js` 和 `styles.css` 来源证明通过。
+- 社区扫描新增阻断项：设置分组标题不能重复插件名。0.1.4 使用通用的“高亮设置”标题。
+- 仅修改标题及版本／文档信息，不调整高亮逻辑和用户配置；本轮继续仅做后台检查及社区扫描，不操作 Obsidian 前台。
+
+**English:** The 0.1.3 hosted build, tests and asset attestations succeeded, but the community scanner rejected a settings heading that repeated the plugin name. Version 0.1.4 uses a generic heading. Highlighting behavior and saved settings are unchanged; no foreground Obsidian tests were performed.
+
 ## 0.1.3：社区审核修复，2026-10-28
 
 - 本轮仅后台验证，未启动、安装或操作 Obsidian。
