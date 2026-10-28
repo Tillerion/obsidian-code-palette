@@ -8,7 +8,7 @@ import {
   TFolder,
   type TAbstractFile,
 } from "obsidian";
-import { languages, languageName, themes, themeName } from "./catalog";
+import { languages, languageName, themes } from "./catalog";
 import type CodePalette from "./main";
 import type { Rule } from "./rules";
 import { resolveRule, cleanPath } from "./rules";
@@ -19,7 +19,7 @@ export class LanguagePicker extends SuggestModal<{
 }> {
   constructor(
     app: App,
-    private select: (id: string) => void,
+    private select: (id: string) => void | Promise<void>,
   ) {
     super(app);
     this.setPlaceholder("搜索语言，例如 Python、C++、Java、SQL");
@@ -38,13 +38,13 @@ export class LanguagePicker extends SuggestModal<{
     el.createSpan({ text: item.id, cls: "cp-picker-id" });
   }
   onChooseSuggestion(item: { id: string }) {
-    this.select(item.id);
+    void this.select(item.id);
   }
 }
 export class ThemePicker extends SuggestModal<{ id: string; name: string }> {
   constructor(
     app: App,
-    private select: (id: string) => void,
+    private select: (id: string) => void | Promise<void>,
   ) {
     super(app);
     this.setPlaceholder("选择代码配色");
@@ -58,7 +58,7 @@ export class ThemePicker extends SuggestModal<{ id: string; name: string }> {
     el.setText(item.name);
   }
   onChooseSuggestion(item: { id: string }) {
-    this.select(item.id);
+    void this.select(item.id);
   }
 }
 export class TargetPicker extends FuzzySuggestModal<TAbstractFile> {

@@ -26,7 +26,7 @@ export class PaletteSettings extends PluginSettingTab {
     el.empty();
     el.addClass("cp-settings");
     const header = el.createDiv({ cls: "cp-settings-header" });
-    header.createEl("h2", { text: "Code Palette" });
+    new Setting(header).setName("Code Palette").setHeading();
     header.createSpan({
       text: `v${this.plugin.manifest.version}`,
       cls: "cp-version",
@@ -243,9 +243,10 @@ export class PaletteSettings extends PluginSettingTab {
         "cp-background",
         this.plugin.settings.blockBackground,
       );
-      const el = pre.ownerDocument.createElement("code");
+      const fragment = pre.ownerDocument.createDocumentFragment();
+      const el = fragment.createEl("code");
       appendTokens(el, r);
-      pre.replaceChildren(el);
+      pre.replaceChildren(fragment);
     } catch (e) {
       if (generation === this.previewGeneration)
         pre.textContent = "预览加载失败，可重新打开设置重试。";

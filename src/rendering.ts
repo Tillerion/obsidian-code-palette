@@ -44,11 +44,9 @@ export function tokenStyle(color: string, fontStyle: number): string {
 export function appendTokens(el: HTMLElement, result: HighlightResult) {
   const frag = el.ownerDocument.createDocumentFragment();
   for (const token of result.tokens) {
-    const span = el.ownerDocument.createElement("span");
-    span.className = "cp-token";
+    const span = frag.createEl("span", { cls: "cp-token" });
     span.style.cssText = tokenStyle(token.color, token.fontStyle);
     span.textContent = token.text;
-    frag.append(span);
   }
   el.replaceChildren(frag);
 }

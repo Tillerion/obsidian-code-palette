@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
+import { JSDOM } from "./dom.ts";
 import { ReadingController } from "../src/reading.ts";
 import { Highlighter, type HighlightResult } from "../src/highlighter.ts";
 import { defaultSettings } from "../src/rules.ts";
@@ -12,6 +12,66 @@ async function until(check: () => boolean) {
     await new Promise((r) => setTimeout(r, 15));
   }
 }
+
+test("reading refresh schedules and cancels timers in its owning popout window", async () => {
+  const d = new JSDOM("<section><code>return False</code></section>"),
+    root = d.window.document.querySelector("section")!,
+    code = root.querySelector("code")!,
+    h = new Highlighter(),
+    settings = defaultSettings();
+  settings.globalPalette = true;
+  let scheduled = 0,
+    lastScheduled: number | undefined;
+  const cancelled: number[] = [];
+  const start = d.window.setTimeout.bind(d.window),
+    cancel = d.window.clearTimeout.bind(d.window);
+  d.window.setTimeout = (...args) => {
+    scheduled++;
+    lastScheduled = start(...args);
+    return lastScheduled;
+  };
+  d.window.clearTimeout = (id) => {
+    if (id !== undefined) cancelled.push(id);
+    cancel(id);
+  };
+  const host: PaletteHost = {
+    highlighter: h,
+    settings,
+    active: true,
+    revision: 0,
+    theme: () => "nord",
+    subscribe: () => () => {},
+    reportError: (error) => {
+      throw error;
+    },
+  };
+  const controller = new ReadingController(root, "popout.md", host);
+  try {
+    await until(() => code.classList.contains("cp-code"));
+    code.textContent = "return True";
+    await until(
+      () => code.querySelector(".cp-token")?.textContent === "return True",
+    );
+    assert.ok(scheduled > 0, "refresh must use the note window's timer");
+    const previousSchedules = scheduled;
+    code.textContent = "return 7";
+    await Promise.resolve(); // Deliver the DOM mutation before its timer runs.
+    assert.ok(scheduled > previousSchedules);
+    const pending = lastScheduled!;
+    assert.equal(cancelled.includes(pending), false);
+    controller.dispose();
+    assert.ok(
+      cancelled.includes(pending),
+      "dispose must cancel the pending timer in its own window",
+    );
+    assert.equal(code.textContent, "return 7");
+    assert.equal(code.classList.contains("cp-code"), false);
+  } finally {
+    controller.dispose();
+    h.dispose();
+    d.window.close();
+  }
+});
 test("global palette themes all ordinary code but only labelled blocks get language tokens", async () => {
   const d = new JSDOM(
     '<section><code id="inline">return False</code><pre><code id="bare">return False</code></pre><pre><code id="java" class="language-java">public class Demo {}</code></pre><pre><code id="unknown" class="language-unlisted">return False</code></pre><pre><code id="diagram" class="language-mermaid">graph LR; A --> B</code></pre></section>',

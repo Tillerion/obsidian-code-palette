@@ -4,11 +4,13 @@
 
 An Obsidian plugin for independent code color themes, optional file/folder language rules, and a vault-wide palette mode without language inference.
 
+Version **0.1.3** fixes community review and release packaging findings while preserving existing highlighting behavior and settings.
+
 ## 📦 Install or update
 
-Download `code-palette-v0.1.2.zip` from the [release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.2). Extract its `code-palette` folder into your vault's `.obsidian/plugins/` directory, then enable **Code Palette** in Community plugins.
+Download `main.js`, `manifest.json` and `styles.css` from the [0.1.3 release page](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3). Put them in your vault's `.obsidian/plugins/code-palette/` directory, then enable **Code Palette** in Community plugins. Local `npm run package` still creates a ZIP; community releases attach only the three installation files.
 
-The community-compatible release tag is exactly `0.1.2`, matching `manifest.json` without a `v` prefix. The ZIP filename may still contain `v`. The historical `v0.1.2` release is retained.
+The community-compatible release tag is exactly `0.1.3`, matching `manifest.json` without a `v` prefix. Historical releases are retained.
 
 For an update, disable the plugin, replace main.js, manifest.json and styles.css, keep your existing data.json, and enable it again.
 
@@ -55,7 +57,7 @@ These screenshots were captured during **v0.1.1** acceptance testing. They illus
 
 Use Node.js 22 or later. Run `npm ci`, then `npm run check`. `npm run package` generates the installation ZIP in `dist/`.
 
-For Obsidian community releases, use the exact manifest version as the GitHub release tag and attach `main.js`, `manifest.json` and `styles.css` directly from the same build, in addition to any optional ZIP.
+For Obsidian community releases, use the exact manifest version as the GitHub release tag and attach only `main.js`, `manifest.json` and `styles.css` directly from the same attested build.
 
 ## License
 

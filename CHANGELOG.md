@@ -1,5 +1,12 @@
 # 更新记录
 
+## 0.1.3
+
+- 🛠️ 修正设置页标题接口、所属窗口计时器、异步选择回调类型、DOM 创建及快照类型。
+- 清单改用以英文句号结尾的描述，主 README 增加英文简介。
+- 社区发布附件收敛为三个安装文件；新增 GitHub Actions 构建与来源证明流程。
+- **English:** Resolve community review findings, use owning-window timers, and publish only the three supported assets with build provenance. Existing highlighting and saved settings remain compatible.
+
 ## 0.1.2
 
 - 📦 社区发布使用不带 `v` 的标签 `0.1.2`，与清单版本完全一致；重新打包的附件包含显示名 `Code Palette`。历史标签不变。

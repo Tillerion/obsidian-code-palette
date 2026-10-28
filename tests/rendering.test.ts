@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
+import { JSDOM } from "./dom.ts";
 import { applyCode, restoreCode } from "../src/rendering.ts";
 import { Highlighter } from "../src/highlighter.ts";
 test("native highlighter replacing same-text nodes is preserved during cleanup", async () => {

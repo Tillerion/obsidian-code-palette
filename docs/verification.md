@@ -1,5 +1,18 @@
 # 验证记录
 
+## 0.1.3：社区审核修复，2026-10-28
+
+- 本轮仅后台验证，未启动、安装或操作 Obsidian。
+- 31 项自动化测试通过，TypeScript 类型检查和生产构建通过。
+- 新增所属窗口计时器回归：修改前失败，修正后通过；验证阅读视图的刷新与清理使用笔记窗口的计时器，内容及卸载恢复保持正确。
+- 原有 Shiki、阅读 DOM、CodeMirror、多语言保留、全局配色开关和配置兼容性用例继续通过。
+- 修复社区报告中的设置标题阻断项，以及计时器、选择回调、DOM 帮助方法、配置快照、未使用导入、描述标点和 README 英文简介问题。
+- 独立静态审查未发现阻断性缺陷；据审查意见细化了计时器用例，检查销毁时取消的确实是尚未运行的计时器 ID。
+- 新增发布工作流：版本校验、测试、生产构建、附件来源证明与验证；正式发布仅上传三个 Obsidian 安装文件。远端执行结果以 GitHub Actions 记录为准。
+- 保留的建议项：旧设置页接口用于兼容 Obsidian 1.8.0；样式覆盖及跨行背景保留，以免削弱代码主题效果；文件列表枚举用于用户主动选择规则范围。这些建议不等同于审核阻断错误。
+
+**English:** 31 background tests, type checking and production build passed. An owning-window timer regression failed before the fix and passed afterward. No frontend Obsidian testing was performed. Legacy settings APIs and scoped code-style overrides remain for compatibility; remote build/attestation results are available in GitHub Actions.
+
 ## v0.1.2：本轮仅后台验证
 
 按用户要求，本轮没有启动或操作 Obsidian，没有前台测试、截图、自动安装或热重载。

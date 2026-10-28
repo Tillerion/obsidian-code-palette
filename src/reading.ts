@@ -14,12 +14,14 @@ export class ReadingController {
   private disposed = false;
   private unsubscribe: () => void;
   private observer?: MutationObserver;
-  private timer?: ReturnType<typeof setTimeout>;
+  private timer?: number;
+  private window: Window;
   constructor(
     private root: HTMLElement,
     private path: string | (() => string),
     private host: PaletteHost,
   ) {
+    this.window = root.ownerDocument.defaultView ?? window;
     const Observer = root.ownerDocument.defaultView?.MutationObserver;
     if (Observer) {
       this.observer = new Observer((mutations) => this.onMutations(mutations));
@@ -34,7 +36,7 @@ export class ReadingController {
       this.path = newPath + this.path.slice(oldPath.length);
   }
   async refresh() {
-    clearTimeout(this.timer);
+    this.window.clearTimeout(this.timer);
     this.timer = undefined;
     const generation = ++this.generation;
     this.release();
@@ -104,7 +106,7 @@ export class ReadingController {
     this.disposed = true;
     this.generation++;
     this.unsubscribe();
-    clearTimeout(this.timer);
+    this.window.clearTimeout(this.timer);
     this.observer?.disconnect();
     this.release();
   }
@@ -166,6 +168,6 @@ export class ReadingController {
         return !record || !isCodePaintIntact(record);
       }) || this.records.some((r) => !this.root.contains(r.el));
     if (changed && this.timer === undefined)
-      this.timer = setTimeout(() => void this.refresh(), 0);
+      this.timer = this.window.setTimeout(() => void this.refresh(), 0);
   }
 }

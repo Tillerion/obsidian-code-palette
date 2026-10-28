@@ -26,12 +26,14 @@ export function createEditorExtension(
       decorations: DecorationSet = Decoration.none;
       private generation = 0;
       private dead = false;
-      private timer?: ReturnType<typeof setTimeout>;
+      private timer?: number;
+      private window: Window;
       private parsedDoc?: Text;
       private regions: CodeRegion[] = [];
       private path = "";
       private unsubscribe: () => void;
       constructor(private view: EditorView) {
+        this.window = view.dom.ownerDocument.defaultView ?? window;
         this.unsubscribe = host.subscribe(() => {
           if (!this.dead)
             this.view.dispatch({ effects: refresh.of(host.revision) });
@@ -52,8 +54,8 @@ export function createEditorExtension(
       }
       private schedule() {
         this.generation++;
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => void this.render(), 35);
+        this.window.clearTimeout(this.timer);
+        this.timer = this.window.setTimeout(() => void this.render(), 35);
       }
       private async render() {
         if (this.dead || !host.active) return;
@@ -206,7 +208,7 @@ export function createEditorExtension(
       destroy() {
         this.dead = true;
         this.generation++;
-        clearTimeout(this.timer);
+        this.window.clearTimeout(this.timer);
         this.unsubscribe();
       }
     },

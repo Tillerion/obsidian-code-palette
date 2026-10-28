@@ -39,8 +39,9 @@
   align-items: baseline;
   gap: 12px;
 }
-.cp-settings-header h2 {
-  margin-bottom: 4px;
+.cp-settings-header .setting-item {
+  padding: 0;
+  border: 0;
 }
 .cp-version {
   color: var(--text-muted);

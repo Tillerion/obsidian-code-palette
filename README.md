@@ -2,7 +2,13 @@
 
 [简体中文](README.md) · [English](README.EN.md)
 
-v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。新增可选的全局代码配色模式，不需要设置语言规则。历史版本标签保留。
+## English overview
+
+Code Palette adds independent syntax highlighting themes to inline code and ordinary code blocks in Obsidian. Set a default language for a file, a folder and its subfolders, or the vault. Existing language labels are preserved. The optional global palette mode themes code throughout the vault without inferring a language for unlabelled snippets. It bundles 24 languages and 10 themes for offline use, supports reading, live preview and source views, and keeps Markdown content unchanged. See the [English guide](README.EN.md) for setup and usage.
+
+## 中文简介
+
+v0.1.3 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独立代码主题。本次修正社区审核与发布流程；保留 v0.1.2 的可选全局配色功能和原有配置。历史版本标签保留。
 
 源码与版本：[Tillerion/obsidian-code-palette](https://github.com/Tillerion/obsidian-code-palette)（公有仓库）。
 
@@ -15,9 +21,9 @@ v0.1.2 为 Obsidian 的行内代码和普通代码块提供多语言高亮及独
 
 ## 安装
 
-从 v0.1.2 发布页下载 `code-palette-v0.1.2.zip`，解压后将 `code-palette` 文件夹放入你的仓库 `.obsidian/plugins/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖 main.js、manifest.json、styles.css 即可，保留自己的 data.json。
+从 [0.1.3 发布页](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3) 下载 `main.js`、`manifest.json`、`styles.css`，放入仓库的 `.obsidian/plugins/code-palette/`。重载 Obsidian，在设置 → 第三方插件中启用 **Code Palette**。更新时覆盖这三个文件，保留自己的 `data.json`。本地执行 `npm run package` 仍可生成 ZIP；社区正式发布只附加三个安装文件。
 
-社区安装对应的正式发布标签为 [`0.1.2`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.2)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。安装包文件名可以保留 `v`。历史 `v0.1.2` 发布保留。
+社区安装对应的正式发布标签为 [`0.1.3`](https://github.com/Tillerion/obsidian-code-palette/releases/tag/0.1.3)，与 `manifest.json` 的 `version` 完全一致，不带 `v` 前缀。历史发布保留。
 
 ## 使用
 

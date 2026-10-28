@@ -195,21 +195,30 @@ export default class CodePalette extends Plugin implements PaletteHost {
   private processReading(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
     if (!el.querySelector("code") && el.tagName !== "CODE") return;
     this.observeDocument(el.ownerDocument);
-    const plugin = this;
     class PaletteChild extends MarkdownRenderChild {
       private controller?: ReadingController;
+      constructor(
+        el: HTMLElement,
+        private plugin: CodePalette,
+      ) {
+        super(el);
+      }
       onload() {
-        this.controller = new ReadingController(el, ctx.sourcePath, plugin);
-        plugin.readers.add(this.controller);
+        this.controller = new ReadingController(
+          el,
+          ctx.sourcePath,
+          this.plugin,
+        );
+        this.plugin.readers.add(this.controller);
       }
       onunload() {
         if (this.controller) {
           this.controller.dispose();
-          plugin.readers.delete(this.controller);
+          this.plugin.readers.delete(this.controller);
         }
       }
     }
-    ctx.addChild(new PaletteChild(el));
+    ctx.addChild(new PaletteChild(el, this));
   }
   theme(doc: Document = document) {
     return activeTheme(
@@ -242,7 +251,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
     });
   }
   async saveSettings() {
-    const snapshot = JSON.parse(JSON.stringify(this.settings));
+    const snapshot: unknown = JSON.parse(JSON.stringify(this.settings));
     this.saveQueue = this.saveQueue
       .catch(() => {})
       .then(() => this.saveData(snapshot));
