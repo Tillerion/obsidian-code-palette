@@ -1,5 +1,16 @@
 # 验证记录
 
+## 0.2.0：已有代码块语言替换
+
+- 35 项后台自动化测试、TypeScript 类型检查、生产构建和 Windows ZIP 打包通过。
+- 新增替换、旧配置兼容、规则优先级和阅读视图用例；实现前四项用例失败，实现后通过。现有真实 CodeMirror 6 集成用例补充 `text → Markdown → text` 切换，并检查 Markdown 原文不变。
+- 覆盖 `text`、语言别名、已有编程语言和未知标记的替换；已知功能块及 `ad-*` 继续排除。全局配色模式暂时绕过替换策略，关闭后恢复原规则。
+- 缺失或无效的新配置值回退“保留”；文件、文件夹和仓库默认规则均可保存策略，语言与策略按原有范围优先级生效。
+- 独立静态审查未发现可操作问题。未启动或操作 Obsidian，新增设置项的实际界面和前台交互未在本轮验收。
+- GitHub 构建、安装文件与 ZIP 来源证明及社区扫描，以对应发布记录为准。
+
+**English:** 35 background tests, type checking, production build and Windows packaging passed. New tests failed before implementation and passed afterward. Reading and CM6 integration cover replacing a `text` fence with Markdown highlighting, restoring preservation and keeping the source unchanged. Known functional blocks and global-palette semantics remain protected. Static review found no actionable issues; no foreground Obsidian testing was performed.
+
 ## 0.1.4：实际社区扫描反馈修复，2026-10-28
 
 - 0.1.3 的 GitHub Actions 构建、31 项测试、三个附件的来源证明及核验成功；社区亦确认 `main.js` 和 `styles.css` 来源证明通过。

@@ -4,12 +4,12 @@
 
 为 Obsidian 的行内代码、表格代码和代码块选择独立配色。按文件或文件夹设置默认语言，让学习笔记中的短代码也能获得语法高亮，笔记原文保持不变。
 
-**English:** Code Palette brings independent code themes to inline code, tables and code blocks in Obsidian. Set a default language for a file or folder, or enable a vault-wide palette without language guessing. Existing code-block language labels are preserved. It includes 24 languages and 10 offline themes, supports reading and editing views, and keeps your Markdown content unchanged. See the [English guide](README.EN.md) for installation and usage.
+**English:** Code Palette brings independent code themes to inline code, tables and code blocks in Obsidian. Set a language for a file or folder, choosing to preserve existing code-block labels or override them for highlighting. A separate global palette works without language guessing. It includes 24 languages and 10 offline themes, supports reading and editing views, and keeps Markdown content unchanged. See the [English guide](README.EN.md) for installation and usage.
 
 ## ✨ 功能
 
 - **范围规则：** 按文件、文件夹及子文件夹设置默认语言，也可设置仓库默认规则。
-- **多语言高亮：** 内置 Python、C/C++、Java、JavaScript/TypeScript、SQL 等 24 种常用语言，保留代码块已有语言标记。
+- **多语言高亮：** 内置 Python、C/C++、Java、JavaScript/TypeScript、SQL 等 24 种常用语言，支持保留已有代码块语言或按规则替换高亮语言。
 - **独立配色：** 10 套离线主题，包括 One Dark Pro、VS Code Dark+/Light+、GitHub、Dracula、Nord 等；可固定配色或跟随明暗模式。
 - **全局代码配色：** 无需设置语言规则，统一仓库内普通代码的外观。无标记代码只使用主题基础文字色与背景色，不猜测语言。
 - **阅读与编辑：** 支持阅读、实时预览和源码模式；只调整代码区域，正文与 Markdown 内容不变。
@@ -30,7 +30,7 @@
    └─ styles.css
 ```
 
-**已有版本更新：** 暂停插件，将 ZIP 中的 `main.js`、`manifest.json`、`styles.css` 覆盖到原目录，再重新启用。保留现有 `data.json`，即可保留语言规则和配色设置。从 0.1.2 更新到 0.1.4 也适用。
+**已有版本更新：** 暂停插件，将 ZIP 中的 `main.js`、`manifest.json`、`styles.css` 覆盖到原目录，再重新启用。保留现有 `data.json`，即可保留语言规则和配色设置。升级到 0.2.0 后，原有规则默认继续保留已有语言。
 
 ### 插件市场
 
@@ -40,7 +40,11 @@
 
 ## 🚀 使用
 
-**按语言高亮：** 保持“全局代码配色”关闭。右键文件或文件夹 → **代码配色：设置语言规则** → 选择 Python、C++、Java 等默认语言。行内代码和无语言标记的普通代码块使用该语言；已有语言标记保持优先。规则优先级为：文件 → 最近的文件夹 → 上级文件夹 → 仓库默认。
+**按语言高亮：** 保持“全局代码配色”关闭。右键文件或文件夹 → **代码配色：设置语言规则** → 选择 Python、C++、Java 等默认语言。行内代码和无语言标记的普通代码块使用该语言。规则优先级为：文件 → 最近的文件夹 → 上级文件夹 → 仓库默认。
+
+**保留或替换已有语言：** 在语言规则的“已有代码块语言”中，选择“保留已有语言（默认）”或“替换为指定语言”。例如，笔记内容是 Markdown，但代码块标成了 `text`：将默认语言设为 **Markdown**，再选择替换，即可按 Markdown 高亮。文件、文件夹及仓库默认规则均支持。
+
+替换模式会对该范围内所有普通代码块使用规则指定的语言，不只针对 `text`。它只改变显示，原始围栏标签和代码内容保持不变。可直接试用[替换语言示例](examples/替换已有语言.md)。
 
 **只统一配色：** 在插件设置中打开 **全局代码配色（不匹配语言）**。已有语言标记的代码块保留语法高亮；行内代码和无标记块只应用基础文字色与背景色。此模式暂时绕过语言规则，关闭后恢复。
 
@@ -55,7 +59,7 @@
 ## 使用说明
 
 - 要求 Obsidian 1.8.0 或更新版本；移动端尚未完成实测。
-- Mermaid、Dataview 等专用功能块保持原处理；`text` 等纯文本标记不会被当成编程语言。
+- Mermaid、Dataview 等已知专用功能块保持原处理。`text` 等纯文本标记默认保持纯文本，启用替换模式后可按规则语言显示。
 - 提供语法高亮，不提供代码执行或语言服务器语义着色；普通标识符不一定呈现多种颜色。
 - 单段代码超过 200,000 字符时保留原生显示。
 

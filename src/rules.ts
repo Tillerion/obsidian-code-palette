@@ -1,9 +1,11 @@
 import { canonicalLanguage, functionalLanguages, themes } from "./catalog";
+export type ExistingLanguagePolicy = "preserve" | "replace";
 export interface Rule {
   kind: "file" | "folder";
   path: string;
   enabled: boolean;
   language: string;
+  existingLanguage?: ExistingLanguagePolicy;
   inline: boolean;
   blocks: boolean;
   recursive: boolean;
@@ -83,13 +85,13 @@ export function chooseLanguage(
   explicit: string,
   fallback: string,
   paletteOnly = false,
+  existingLanguage: ExistingLanguagePolicy = "preserve",
 ): string | null {
   const id = explicit.trim().split(/\s+/)[0].toLowerCase();
-  if (id)
-    return functionalLanguages.has(id) || id.startsWith("ad-")
-      ? null
-      : (canonicalLanguage(id) ?? (paletteOnly ? "text" : null));
-  return paletteOnly ? "text" : canonicalLanguage(fallback);
+  if (id && (functionalLanguages.has(id) || id.startsWith("ad-"))) return null;
+  if (paletteOnly) return id ? (canonicalLanguage(id) ?? "text") : "text";
+  if (existingLanguage === "replace") return canonicalLanguage(fallback);
+  return id ? canonicalLanguage(id) : canonicalLanguage(fallback);
 }
 export function moveRules(
   rules: Rule[],
@@ -138,6 +140,8 @@ export function normalizeSettings(raw: unknown): Settings {
       kind: r.kind,
       path,
       language,
+      existingLanguage:
+        r.existingLanguage === "replace" ? "replace" : "preserve",
       enabled: r.enabled !== false,
       inline: r.inline !== false,
       blocks: r.blocks !== false,

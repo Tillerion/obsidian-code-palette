@@ -32,7 +32,7 @@ export class PaletteSettings extends PluginSettingTab {
       cls: "cp-version",
     });
     el.createEl("p", {
-      text: "按笔记设置语言，为代码选择独立配色。已有语言标记始终保留。",
+      text: "按笔记设置语言，为代码选择独立配色。可保留或替换已有代码块语言。",
       cls: "cp-description",
     });
     new Setting(el)
@@ -133,6 +133,7 @@ export class PaletteSettings extends PluginSettingTab {
                 kind: "folder",
                 path: "",
                 language: "python",
+                existingLanguage: "preserve",
                 enabled: true,
                 inline: true,
                 blocks: true,
@@ -154,6 +155,22 @@ export class PaletteSettings extends PluginSettingTab {
           }).open(),
         ),
       );
+      new Setting(el)
+        .setName("已有代码块语言")
+        .setDesc(
+          "仓库默认规则可保留已有标记，或统一按仓库默认语言显示。功能块不受影响；全局配色模式下不使用语言规则。",
+        )
+        .addDropdown((d) =>
+          d
+            .addOption("preserve", "保留已有语言（默认）")
+            .addOption("replace", "替换为指定语言")
+            .setValue(fallback.existingLanguage ?? "preserve")
+            .onChange(async (value) => {
+              fallback.existingLanguage =
+                value === "replace" ? "replace" : "preserve";
+              await this.plugin.saveSettings();
+            }),
+        );
       new Setting(el).setName("仓库默认行内代码").addToggle((t) =>
         t.setValue(fallback.inline).onChange(async (v) => {
           fallback.inline = v;

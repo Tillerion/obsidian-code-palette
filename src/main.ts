@@ -162,7 +162,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
         new Notice(
           !r
             ? "当前文件使用 Obsidian 原生代码显示。"
-            : `${r.source}\n${r.enabled ? (r.paletteOnly ? "语言：仅沿用代码块已有标记" : "默认语言：" + languageName(r.language)) : "已关闭插件效果"}\n配色：${themeName(this.theme())}`,
+            : `${r.source}\n${r.enabled ? (r.paletteOnly ? "语言：仅沿用代码块已有标记" : "默认语言：" + languageName(r.language) + (r.existingLanguage === "replace" ? "（替换已有语言）" : "（保留已有语言）")) : "已关闭插件效果"}\n配色：${themeName(this.theme())}`,
           7000,
         );
       },

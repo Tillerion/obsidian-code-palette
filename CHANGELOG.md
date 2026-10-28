@@ -1,5 +1,12 @@
 # 更新记录
 
+## 0.2.0
+
+- ✨ 新增已有代码块语言“保留／替换”策略，支持文件、文件夹和仓库默认规则。
+- 支持把 `text` 标记的 Markdown 内容按 Markdown 高亮；只调整显示，保留原文与围栏标签。
+- 默认兼容旧规则，保留功能块保护及全局配色模式的无语言推断行为。
+- **English:** Add opt-in language replacement for explicitly labelled ordinary code blocks. Existing rules preserve labels by default; source text, functional blocks and global palette semantics remain unchanged.
+
 ## 0.1.4
 
 - 🛠️ 设置页使用通用标题“高亮设置”，修正 0.1.3 社区扫描新增的插件名重复错误。

@@ -86,6 +86,7 @@ export function createEditorExtension(
                 region.language,
                 rule.language,
                 rule.paletteOnly,
+                rule.existingLanguage,
               );
               return {
                 region,

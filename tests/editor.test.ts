@@ -98,7 +98,7 @@ test("a long block only emits marks inside visible ranges while preserving multi
     dom.window.close();
   }
 });
-test("real CM6 global palette preserves Java, leaves inline code plain, and restores rules when disabled", async () => {
+test("real CM6 preserves global palette and replaces text fences without changing source", async () => {
   const dom = new JSDOM('<!doctype html><body><div id="editor"></div></body>', {
     pretendToBeVisual: true,
   });
@@ -152,7 +152,8 @@ test("real CM6 global palette preserves Java, leaves inline code plain, and rest
       throw e;
     },
   };
-  const source = "正文 `return 42`\n\n```java\npublic class Demo {}\n```";
+  const source =
+    "正文 `return 42`\n\n```java\npublic class Demo {}\n```\n\n```text\n# Heading\n\n**bold** and [link](https://example.com)\n```";
   settings.globalPalette = true;
   const view = new EditorView({
     state: EditorState.create({
@@ -186,6 +187,27 @@ test("real CM6 global palette preserves Java, leaves inline code plain, and rest
     host.revision++;
     listeners.forEach((f) => f());
     await until(() => inlineColors().size > 1);
+    const blockColors = () => {
+      const line = [...view.dom.querySelectorAll(".cm-line")].find((n) =>
+        n.textContent?.includes("**bold**"),
+      );
+      return new Set(
+        [...line!.querySelectorAll<HTMLElement>(".cp-syntax")].map(
+          (n) => n.style.color,
+        ),
+      );
+    };
+    assert.equal(blockColors().size, 1);
+    settings.defaultRule!.language = "markdown";
+    settings.defaultRule!.existingLanguage = "replace";
+    host.revision++;
+    listeners.forEach((f) => f());
+    await until(() => blockColors().size > 1);
+    assert.equal(view.state.doc.toString(), source);
+    settings.defaultRule!.existingLanguage = "preserve";
+    host.revision++;
+    listeners.forEach((f) => f());
+    await until(() => blockColors().size === 1);
     settings.enabled = false;
     host.revision++;
     listeners.forEach((f) => f());

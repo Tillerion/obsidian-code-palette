@@ -34,6 +34,77 @@ const rule = (
   ...extra,
 });
 
+test("explicit language replacement is opt-in and never overrides functional blocks or global palette", () => {
+  assert.equal(
+    chooseLanguage("text", "markdown", false, "replace"),
+    "markdown",
+  );
+  assert.equal(
+    chooseLanguage("java title=Demo", "md", false, "replace"),
+    "markdown",
+  );
+  assert.equal(
+    chooseLanguage("unknown", "markdown", false, "replace"),
+    "markdown",
+  );
+  assert.equal(chooseLanguage("txt", "python", false, "preserve"), "text");
+  assert.equal(chooseLanguage("", "markdown", false, "replace"), "markdown");
+  for (const label of [
+    "mermaid",
+    "dataview",
+    "dataviewjs",
+    "tasks",
+    "ad-custom",
+    "bases",
+  ]) {
+    assert.equal(chooseLanguage(label, "markdown", false, "replace"), null);
+  }
+  assert.equal(chooseLanguage("java", "markdown", true, "replace"), "java");
+  assert.equal(chooseLanguage("text", "markdown", true, "replace"), "text");
+  assert.equal(chooseLanguage("", "markdown", true, "replace"), "text");
+});
+
+test("existing-language policy survives settings reload and safely defaults for legacy or invalid values", () => {
+  const s = normalizeSettings({
+    rules: [
+      rule("file", "old.md", "markdown"),
+      rule("folder", "docs", "markdown", { existingLanguage: "replace" }),
+    ],
+    defaultRule: rule("folder", "", "java", { existingLanguage: "replace" }),
+  });
+  assert.equal(s.rules[0].existingLanguage, "preserve");
+  assert.equal(s.rules[1].existingLanguage, "replace");
+  assert.equal(s.defaultRule?.existingLanguage, "replace");
+  assert.deepEqual(normalizeSettings(JSON.parse(JSON.stringify(s))), s);
+  for (const value of [true, "all", null]) {
+    assert.equal(
+      normalizeSettings({
+        rules: [
+          rule("file", "note.md", "markdown", { existingLanguage: value }),
+        ],
+      }).rules[0].existingLanguage,
+      "preserve",
+    );
+  }
+});
+
+test("language replacement follows the selected scope and resumes after global palette is disabled", () => {
+  const s = normalizeSettings({
+    rules: [
+      rule("folder", "docs", "markdown", { existingLanguage: "replace" }),
+      rule("file", "docs/keep.md", "java", { existingLanguage: "preserve" }),
+    ],
+    defaultRule: rule("folder", "", "python", { existingLanguage: "replace" }),
+  });
+  assert.equal(resolveRule("docs/sub/note.md", s)?.existingLanguage, "replace");
+  assert.equal(resolveRule("docs/keep.md", s)?.existingLanguage, "preserve");
+  assert.equal(resolveRule("elsewhere.md", s)?.existingLanguage, "replace");
+  s.globalPalette = true;
+  assert.equal(resolveRule("docs/sub/note.md", s)?.paletteOnly, true);
+  s.globalPalette = false;
+  assert.equal(resolveRule("docs/sub/note.md", s)?.existingLanguage, "replace");
+});
+
 test("global palette bypasses saved language rules and restores them when disabled", () => {
   const s = defaultSettings();
   s.rules = [rule("file", "note.md", "cpp", { enabled: false })];

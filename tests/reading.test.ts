@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { JSDOM } from "./dom.ts";
 import { ReadingController } from "../src/reading.ts";
 import { Highlighter, type HighlightResult } from "../src/highlighter.ts";
-import { defaultSettings } from "../src/rules.ts";
+import { defaultSettings, normalizeSettings } from "../src/rules.ts";
 import type { PaletteHost } from "../src/host.ts";
 async function until(check: () => boolean) {
   const end = Date.now() + 3000;
@@ -12,6 +12,74 @@ async function until(check: () => boolean) {
     await new Promise((r) => setTimeout(r, 15));
   }
 }
+
+test("text-labelled blocks can render as Markdown and restore their original language and DOM", async () => {
+  const d = new JSDOM(
+      '<section><pre><code class="language-text"># Heading\n\n**bold** and [link](https://example.com)</code></pre><pre><code class="language-mermaid">graph LR; A --&gt; B</code></pre></section>',
+    ),
+    root = d.window.document.querySelector("section")!,
+    code = root.querySelector(".language-text")!,
+    originalNode = code.firstChild,
+    originalText = root.textContent,
+    highlighter = new Highlighter(),
+    settings = normalizeSettings({
+      defaultRule: { kind: "folder", path: "", language: "markdown" },
+    }),
+    listeners = new Set<() => void>();
+  const host: PaletteHost = {
+    highlighter,
+    settings,
+    active: true,
+    revision: 0,
+    theme: () => "one-dark-pro",
+    subscribe: (f) => {
+      listeners.add(f);
+      return () => {
+        listeners.delete(f);
+      };
+    },
+    reportError: (error) => {
+      throw error;
+    },
+  };
+  const colors = () =>
+    new Set(
+      [...code.querySelectorAll<HTMLElement>(".cp-token")].map(
+        (n) => n.style.color,
+      ),
+    );
+  const refresh = () => {
+    host.revision++;
+    listeners.forEach((f) => f());
+  };
+  const controller = new ReadingController(root, "docs/note.md", host);
+  try {
+    await until(() => code.classList.contains("cp-code"));
+    assert.equal(colors().size, 1);
+    settings.defaultRule!.existingLanguage = "replace";
+    refresh();
+    await until(() => colors().size > 1);
+    assert.ok(code.classList.contains("language-text"));
+    assert.equal(root.querySelector(".language-mermaid .cp-token"), null);
+    assert.equal(root.textContent, originalText);
+    settings.globalPalette = true;
+    refresh();
+    await until(() => colors().size === 1);
+    settings.globalPalette = false;
+    refresh();
+    await until(() => colors().size > 1);
+    settings.defaultRule!.existingLanguage = "preserve";
+    refresh();
+    await until(() => colors().size === 1);
+    controller.dispose();
+    assert.equal(code.firstChild, originalNode);
+    assert.equal(root.textContent, originalText);
+  } finally {
+    controller.dispose();
+    highlighter.dispose();
+    d.window.close();
+  }
+});
 
 test("reading refresh schedules and cancels timers in its owning popout window", async () => {
   const d = new JSDOM("<section><code>return False</code></section>"),

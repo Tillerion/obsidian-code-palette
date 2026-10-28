@@ -100,7 +100,7 @@ export class RuleModal extends Modal {
     );
     const inherited = resolveRule(
       kind === "file" ? path : `${path}/_preview.md`,
-      plugin.settings,
+      { ...plugin.settings, globalPalette: false },
     );
     this.draft = existing
       ? { ...existing }
@@ -109,6 +109,7 @@ export class RuleModal extends Modal {
           path,
           enabled: true,
           language: inherited?.language ?? "python",
+          existingLanguage: inherited?.existingLanguage ?? "preserve",
           inline: true,
           blocks: true,
           recursive: true,
@@ -132,7 +133,9 @@ export class RuleModal extends Modal {
       );
     new Setting(el)
       .setName("默认语言")
-      .setDesc("应用于行内代码和未标注语言的代码块；保留已有语言。")
+      .setDesc(
+        "用于行内代码和普通代码块；已有语言标记的处理方式由下方选项控制。",
+      )
       .addButton((b) =>
         b.setButtonText(languageName(this.draft.language)).onClick(() =>
           new LanguagePicker(this.app, (id) => {
@@ -140,6 +143,21 @@ export class RuleModal extends Modal {
             b.setButtonText(languageName(id));
           }).open(),
         ),
+      );
+    new Setting(el)
+      .setName("已有代码块语言")
+      .setDesc(
+        "选择替换后，所有普通代码块均按上方指定的语言高亮，包括 text；只改变显示，功能块不受影响。",
+      )
+      .addDropdown((d) =>
+        d
+          .addOption("preserve", "保留已有语言（默认）")
+          .addOption("replace", "替换为指定语言")
+          .setValue(this.draft.existingLanguage ?? "preserve")
+          .onChange((value) => {
+            this.draft.existingLanguage =
+              value === "replace" ? "replace" : "preserve";
+          }),
       );
     new Setting(el)
       .setName("行内代码")
@@ -184,6 +202,6 @@ export class RuleModal extends Modal {
 }
 export function describeRule(rule: Rule): string {
   return rule.enabled
-    ? `${languageName(rule.language)} · ${[rule.inline ? "行内代码" : "", rule.blocks ? "代码块" : ""].filter(Boolean).join("、") || "未启用代码类型"}${rule.kind === "folder" ? (rule.recursive ? " · 含子目录" : " · 仅本层") : ""}`
+    ? `${languageName(rule.language)} · ${[rule.inline ? "行内代码" : "", rule.blocks ? "代码块" : ""].filter(Boolean).join("、") || "未启用代码类型"}${rule.existingLanguage === "replace" ? " · 替换已有语言" : " · 保留已有语言"}${rule.kind === "folder" ? (rule.recursive ? " · 含子目录" : " · 仅本层") : ""}`
     : "已关闭插件效果";
 }
