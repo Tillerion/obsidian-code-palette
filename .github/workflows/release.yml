@@ -1,6 +1,7 @@
 name: Build and publish attested release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "[0-9]*"
@@ -38,15 +39,21 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
           const versions = JSON.parse(fs.readFileSync('versions.json', 'utf8'));
           if (!/^\d+\.\d+\.\d+$/.test(manifest.version) ||
-              process.env.GITHUB_REF_NAME !== manifest.version ||
+              (process.env.GITHUB_REF_TYPE === 'tag' && process.env.GITHUB_REF_NAME !== manifest.version) ||
               pkg.version !== manifest.version ||
               versions[manifest.version] !== manifest.minAppVersion) {
             throw new Error('Tag, manifest, package and compatibility versions must match.');
           }
           NODE
       - run: npm ci
-      - run: npm run check
+      - run: npm run package
+      - name: Attest installation ZIP
+        if: github.event_name == 'push' && github.ref_type == 'tag'
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: dist/code-palette-v${{ github.ref_name }}.zip
       - name: Attest distributed files
+        if: github.event_name == 'push' && github.ref_type == 'tag'
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
         with:
           subject-path: |
@@ -54,6 +61,7 @@ jobs:
             manifest.json
             styles.css
       - name: Verify attestations and publish
+        if: github.event_name == 'push' && github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.ref_name }}
@@ -61,7 +69,9 @@ jobs:
           gh attestation verify main.js --repo "$GITHUB_REPOSITORY"
           gh attestation verify styles.css --repo "$GITHUB_REPOSITORY"
           gh attestation verify manifest.json --repo "$GITHUB_REPOSITORY"
+          gh attestation verify "dist/code-palette-v$RELEASE_TAG.zip" --repo "$GITHUB_REPOSITORY"
           gh release create "$RELEASE_TAG" main.js manifest.json styles.css \
+            "dist/code-palette-v$RELEASE_TAG.zip" \
             --verify-tag --draft --title "Code Palette $RELEASE_TAG" \
             --notes-file "docs/releases/$RELEASE_TAG.md"
           gh release edit "$RELEASE_TAG" --draft=false --latest
