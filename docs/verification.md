@@ -8,8 +8,10 @@
 - 缺失或无效的新配置值回退“保留”；文件、文件夹和仓库默认规则均可保存策略，语言与策略按原有范围优先级生效。
 - 独立静态审查未发现可操作问题。未启动或操作 Obsidian，新增设置项的实际界面和前台交互未在本轮验收。
 - GitHub 构建、安装文件与 ZIP 来源证明及社区扫描，以对应发布记录为准。
+- [GitHub Actions 0.2.0](https://github.com/Tillerion/obsidian-code-palette/actions/runs/40627023025) 已成功完成构建、测试、ZIP 打包及四个附件的来源证明与核验；下载后的 ZIP 摘要和目录结构通过检查。
+- 社区正式扫描记录为 `0.2.0 / 1f1e9f8 / Completed`，没有 Error，源码构建可逐字节复现发布主程序。公开页已显示 0.2.0，短描述和长描述均已更新，保留非阻断 Warning/Recommendation。
 
-**English:** 35 background tests, type checking, production build and Windows packaging passed. New tests failed before implementation and passed afterward. Reading and CM6 integration cover replacing a `text` fence with Markdown highlighting, restoring preservation and keeping the source unchanged. Known functional blocks and global-palette semantics remain protected. Static review found no actionable issues; no foreground Obsidian testing was performed.
+**English:** 35 background tests, type checking, production build and Windows packaging passed. New tests failed before implementation and passed afterward. Reading and CM6 integration cover replacing a `text` fence with Markdown highlighting, restoring preservation and keeping the source unchanged. Known functional blocks and global-palette semantics remain protected. Static review found no actionable issues; no foreground Obsidian testing was performed. Hosted build and all four asset attestations succeeded. The community scan is Completed with no Error findings; its public version and descriptions now reflect 0.2.0. Non-blocking advisories remain.
 
 ## 0.1.4：实际社区扫描反馈修复，2026-10-28
 
