@@ -10,9 +10,10 @@
 - 在同一 Obsidian Electron 环境内创建离屏 CodeMirror 6 编辑器，使用实际插件扩展与原生 MarkdownRenderer，验证正文预览、光标进入编辑、移出恢复、源码模式保留围栏及切回“保留”策略。未对用户当前编辑器执行交互。
 - 阅读及编辑器探针均确认源字符串不变、渲染组件和订阅完成清理、没有报告错误；安装前后规则配置 SHA-256 相同。
 - 独立静态复审未发现发布阻断问题。真实设置页点击、前台视觉布局、手机端和其他渲染插件组合未在本轮验证。
-- GitHub 托管构建、附件来源证明和社区扫描结果以对应公开发布记录为准。
+- [GitHub Actions 0.2.1](https://github.com/Tillerion/obsidian-code-palette/actions/runs/40649437729) 成功完成托管构建、测试及四个附件的来源证明与核验；发布主程序摘要与本地最终构建相同。下载后的 ZIP 摘要和目录结构通过检查。
+- 社区扫描记录为 `0.2.1 / 0ac7603 / Completed`，没有 Error，主程序逐字节构建复现通过；公开版本及短、长描述均已更新。保留非阻断 Warning/Recommendation，继续提供 ZIP 安装包。
 
-**English:** All 42 background tests, type checking and the production build passed. The native Obsidian renderer and plugin reading postprocessor produced actual Markdown headings, bold text, lists and a table. An offscreen CM6 editor in the same Electron process verified preview/edit/source transitions using the real extension and native renderer. Global palette respected matched rules. Source strings and saved settings were preserved, and render resources were released without reported errors. Static review found no release blockers. Foreground layout, settings clicks, mobile and third-party renderer combinations were not tested.
+**English:** All 42 background tests, type checking and the production build passed. The native Obsidian renderer and plugin reading postprocessor produced actual Markdown headings, bold text, lists and a table. An offscreen CM6 editor in the same Electron process verified preview/edit/source transitions using the real extension and native renderer. Global palette respected matched rules. Source strings and saved settings were preserved, and render resources were released without reported errors. Static review found no release blockers. Hosted release and all four asset attestations succeeded; the downloaded ZIP hash and structure were verified. The community scan is Completed with no Error findings and a byte-for-byte reproducible build. Its public version and descriptions reflect 0.2.1; advisory findings remain. Foreground layout, settings clicks, mobile and third-party renderer combinations were not tested.
 
 ## 0.2.0：已有代码块语言替换
 
