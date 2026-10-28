@@ -13,9 +13,10 @@
 - 后台窗口采样时临时取消 Electron 动画／计时器节流，结束后恢复原值；本机三个安装文件有备份，规则配置文件摘要未变化，探针没有编辑用户笔记。
 - 独立审查发现的边界锁丢失、缓存预算、映射复杂度和同步全文解析问题均已修复。额外原生 CSS 检查验证嵌套原生 span 继承外层词元颜色。
 - 本轮未执行前台鼠标验收、真实中文输入法候选词操作和移动端验证；IME 用例验证组合状态保护，不能替代所有输入法的端到端验收。
-- GitHub 发布、附件来源证明和社区扫描以对应公开发布记录为准。
+- [GitHub Actions 0.3.0](https://github.com/Tillerion/obsidian-code-palette/actions/runs/40659753194) 成功完成构建、测试、打包与四个附件的来源证明和核验；三个安装文件摘要与本地构建相同，下载后的 ZIP 摘要与目录结构通过检查。
+- 社区正式扫描为 `0.3.0 / 7cfba46 / Completed`，没有 Error，主程序逐字节构建复现通过；社区说明已更新为稳定编辑、独立正文预览和显式完成的新交互。保留非阻断 Warning/Recommendation。
 
-**English:** All 52 background tests, type checks and the production build passed. Independent review compared 6,305 incremental parses with fresh parses without differences. A native Obsidian offscreen CM6 probe used a 120ms delayed highlighter: all 18 input transactions and 174 samples, including 118 animation frames, retained at least 9 colored nodes with one base color. Native Markdown rendering, persistent editing, explicit completion, preview toggle, cleanup and focus preservation passed. Background throttling was restored and saved rules were unchanged. Foreground mouse testing, actual IME candidate interaction and mobile were not performed.
+**English:** All 52 background tests, type checks and the production build passed. Independent review compared 6,305 incremental parses with fresh parses without differences. A native Obsidian offscreen CM6 probe used a 120ms delayed highlighter: all 18 input transactions and 174 samples, including 118 animation frames, retained at least 9 colored nodes with one base color. Native Markdown rendering, persistent editing, explicit completion, preview toggle, cleanup and focus preservation passed. Background throttling was restored and saved rules were unchanged. Hosted release and all four asset attestations succeeded; local and release asset hashes matched. The community scan is Completed with no Error findings and a reproducible build; advisory findings remain. Foreground mouse testing, actual IME candidate interaction and mobile were not performed.
 
 ## 0.2.1：Markdown 正文预览与全局配色优先级
 

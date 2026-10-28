@@ -37,4 +37,4 @@ Composition and selection changes must not remove source; delimiter deletion mus
 
 - [x] Run full check, independent code review and native Obsidian background typing/frame probes; fix findings and record exact limits.
 - [x] Update bilingual README/changelog, example and verification/release notes; package ZIP and verify contents.
-- [ ] Commit/push main and 0.3.0 tag; verify hosted workflow, assets and attestations; update public community text and confirm completed scan.
+- [x] Commit/push main and 0.3.0 tag; verify hosted workflow, assets and attestations; update public community text and confirm completed scan.
