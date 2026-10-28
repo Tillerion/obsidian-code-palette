@@ -13,6 +13,7 @@ export interface Rule {
 export interface Settings {
   enabled: boolean;
   globalPalette: boolean;
+  markdownPreview: boolean;
   rules: Rule[];
   defaultRule: Rule | null;
   themeMode: "auto" | "fixed";
@@ -26,6 +27,7 @@ export function defaultSettings(): Settings {
   return {
     enabled: true,
     globalPalette: false,
+    markdownPreview: true,
     rules: [],
     defaultRule: null,
     themeMode: "auto",
@@ -123,7 +125,12 @@ export function normalizeSettings(raw: unknown): Settings {
   const d = defaultSettings();
   if (!raw || typeof raw !== "object") return d;
   const v = raw as Record<string, unknown>;
-  for (const k of ["enabled", "globalPalette", "blockBackground"] as const)
+  for (const k of [
+    "enabled",
+    "globalPalette",
+    "blockBackground",
+    "markdownPreview",
+  ] as const)
     if (typeof v[k] === "boolean") d[k] = v[k];
   if (v.themeMode === "auto" || v.themeMode === "fixed")
     d.themeMode = v.themeMode;

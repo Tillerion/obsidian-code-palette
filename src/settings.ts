@@ -55,6 +55,17 @@ export class PaletteSettings extends PluginSettingTab {
           await this.plugin.saveSettings();
         }),
       );
+    new Setting(el)
+      .setName("Markdown 正文预览")
+      .setDesc(
+        "Markdown 替换规则可将代码块渲染为正文。双击进入编辑后保持原文状态，点击块末尾“完成编辑”或运行对应命令才恢复正文；关闭后仅保留语法高亮。",
+      )
+      .addToggle((t) =>
+        t.setValue(this.plugin.settings.markdownPreview).onChange(async (v) => {
+          this.plugin.settings.markdownPreview = v;
+          await this.plugin.saveSettings();
+        }),
+      );
     new Setting(el).setName("代码配色").setHeading();
     new Setting(el).setName("切换方式").addDropdown((d) =>
       d

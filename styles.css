@@ -1,4 +1,11 @@
 /* All visual overrides are scoped to plugin-managed code or its settings. */
+.cp-finish-edit {
+  margin-left: 0.75em;
+}
+.cp-finish-edit button {
+  font-size: var(--font-ui-smaller);
+  padding: 2px 8px;
+}
 .cp-markdown-preview {
   white-space: normal;
   font-family: var(--font-text);
@@ -37,9 +44,17 @@
 }
 .cp-editor-block {
   color: var(--cp-fg) !important;
+  font-style: normal;
+  font-weight: normal;
 }
 .cp-editor-inline {
   color: var(--cp-fg) !important;
+  font-style: normal;
+  font-weight: normal;
+}
+.cp-editor-block span:not(.cp-syntax),
+.cp-editor-inline span:not(.cp-syntax) {
+  color: inherit !important;
 }
 .cp-syntax,
 .cp-token {

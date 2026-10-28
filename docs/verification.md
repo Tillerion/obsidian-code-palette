@@ -1,5 +1,22 @@
 # 验证记录
 
+## 0.3.0：稳定代码编辑与显式完成 Markdown 编辑
+
+日期：2026-10-28。Windows、Node.js 24.21.0、Obsidian 1.14.5。
+
+- 52 项后台测试、TypeScript 检查和生产构建通过。先复现旧版光标移动清空颜色、离开 Markdown 块自动解除编辑和新设置缺失，再实现修复。
+- 回归覆盖连续输入期间的颜色保留、只重算变化块、换行、围栏删除、旧异步结果、输入法组合状态、多块编辑、围栏末尾扩张、补齐围栏、显式完成、设置迁移和资源释放。既有语言、主题、全局兜底及阅读视图用例继续通过。
+- 独立审查执行 6,305 次增量解析与全文解析对照，覆盖 YAML、引用、缩进、围栏、行内代码、Unicode、CRLF 和多范围变更，未发现差异。
+- 独立审查的 jsdom 样例包含 1,072,000 字符、2,000 个代码块：增量区域更新约 2.4–6.7ms，完整输入事务约 2.1–11.3ms，后半多数约 2–3ms；这些是后台样例测量，不代表所有设备或真实帧率。
+- 在真实 Obsidian Electron 环境中，用离屏 CM6 编辑器、实际扩展代码和原生高亮／Markdown 渲染服务验证。高亮人为增加 120ms 延迟，18 次输入事务、174 次采样（含 118 个动画帧）中，最少着色节点恒为 9，基础文字色只有一种；笔记源字符串保留原围栏。
+- 原生 Markdown 标题、列表和表格输出通过；光标移出后继续编辑、按钮与显式完成恢复正文、关闭预览仍保留高亮、组件与订阅释放、焦点保留均通过。确认已安装插件的 ViewPlugin 也在原生用户编辑器中加载。
+- 后台窗口采样时临时取消 Electron 动画／计时器节流，结束后恢复原值；本机三个安装文件有备份，规则配置文件摘要未变化，探针没有编辑用户笔记。
+- 独立审查发现的边界锁丢失、缓存预算、映射复杂度和同步全文解析问题均已修复。额外原生 CSS 检查验证嵌套原生 span 继承外层词元颜色。
+- 本轮未执行前台鼠标验收、真实中文输入法候选词操作和移动端验证；IME 用例验证组合状态保护，不能替代所有输入法的端到端验收。
+- GitHub 发布、附件来源证明和社区扫描以对应公开发布记录为准。
+
+**English:** All 52 background tests, type checks and the production build passed. Independent review compared 6,305 incremental parses with fresh parses without differences. A native Obsidian offscreen CM6 probe used a 120ms delayed highlighter: all 18 input transactions and 174 samples, including 118 animation frames, retained at least 9 colored nodes with one base color. Native Markdown rendering, persistent editing, explicit completion, preview toggle, cleanup and focus preservation passed. Background throttling was restored and saved rules were unchanged. Foreground mouse testing, actual IME candidate interaction and mobile were not performed.
+
 ## 0.2.1：Markdown 正文预览与全局配色优先级
 
 日期：2026-10-28。Windows、Node.js 24.21.0、Obsidian 1.14.5。

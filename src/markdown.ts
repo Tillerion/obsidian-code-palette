@@ -1,4 +1,5 @@
 import { parser, GFM } from "@lezer/markdown";
+import type { TreeFragment } from "@lezer/common";
 const markdownParser = parser.configure(GFM);
 export interface CodeSegment {
   from: number;
@@ -14,6 +15,12 @@ export interface CodeRegion {
   segments: CodeSegment[];
 }
 export function findCodeRegions(source: string): CodeRegion[] {
+  return parseCodeRegions(source).regions;
+}
+export function parseCodeRegions(
+  source: string,
+  fragments: readonly TreeFragment[] = [],
+) {
   const regions: CodeRegion[] = [];
   let frontmatter = 0;
   const firstEnd = source.indexOf("\n");
@@ -36,7 +43,8 @@ export function findCodeRegions(source: string): CodeRegion[] {
     ? source.slice(0, frontmatter).replace(/[^\r\n]/g, " ") +
       source.slice(frontmatter)
     : source;
-  markdownParser.parse(parseSource).iterate({
+  const tree = markdownParser.parse(parseSource, fragments);
+  tree.iterate({
     enter(node) {
       if (node.to <= frontmatter) return false;
       if (node.name === "InlineCode") {
@@ -93,5 +101,5 @@ export function findCodeRegions(source: string): CodeRegion[] {
       }
     },
   });
-  return regions;
+  return { regions, tree, frontmatter };
 }

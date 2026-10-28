@@ -1,302 +1,280 @@
 import {
   StateEffect,
-  StateField,
+  RangeSet,
   type EditorState,
-  type Text,
   type Range,
 } from "@codemirror/state";
 import {
   ViewPlugin,
   Decoration,
   type DecorationSet,
-  EditorView,
+  type EditorView,
   type ViewUpdate,
 } from "@codemirror/view";
 import type { PaletteHost } from "./host";
-import { resolveRule, chooseLanguage, rendersMarkdownBody } from "./rules";
-import { findCodeRegions, type CodeRegion } from "./markdown";
-import { tokenStyle } from "./rendering";
-import { MarkdownPreviewWidget } from "./markdown-widget";
-const refresh = StateEffect.define<number>();
+import type { HighlightResult } from "./highlighter";
+import { resolveRule, chooseLanguage } from "./rules";
+import type { CodeRegion } from "./markdown";
+import { codeRegions } from "./editor-regions";
+import { createMarkdownPreviews, refreshEditor } from "./editor-preview";
+import { paintEditor } from "./editor-paint";
+export { finishMarkdownEditing } from "./editor-preview";
 const painted = StateEffect.define<number>();
 export function createEditorExtension(
   host: PaletteHost,
-  getPath: (state: EditorState) => string,
-  isLivePreview: (state: EditorState) => boolean = () => false,
+  getPath: (s: EditorState) => string,
+  isLive: (s: EditorState) => boolean = () => false,
 ) {
-  const parsed = new WeakMap<Text, CodeRegion[]>();
-  const regionsFor = (state: EditorState) => {
-    let regions = parsed.get(state.doc);
-    if (!regions) {
-      regions = findCodeRegions(state.doc.toString());
-      parsed.set(state.doc, regions);
-    }
-    return regions;
-  };
-  const previewsFor = (state: EditorState): DecorationSet => {
-    if (!host.active || !host.renderMarkdown || !isLivePreview(state))
-      return Decoration.none;
-    const path = getPath(state),
-      rule = path ? resolveRule(path, host.settings) : null;
-    if (!rule?.enabled) return Decoration.none;
-    const widgets: Range<Decoration>[] = [];
-    for (const region of regionsFor(state)) {
-      if (
-        region.kind !== "block" ||
-        region.to <= region.from ||
-        region.text.length > 200_000 ||
-        !rendersMarkdownBody(rule, region.language)
-      )
-        continue;
-      const editing = state.selection.ranges.some((r) =>
-        r.empty
-          ? r.from > region.from && r.from < region.to
-          : r.from < region.to && r.to > region.from,
-      );
-      if (editing) continue;
-      const anchor = Math.min(
-        region.to - 1,
-        Math.max(region.from + 1, region.segments[0]?.from ?? region.from),
-      );
-      widgets.push(
-        Decoration.replace({
-          block: true,
-          widget: new MarkdownPreviewWidget(
-            host,
-            region.text,
-            path,
-            anchor,
-            host.revision,
-          ),
-        }).range(region.from, region.to),
-      );
-    }
-    return Decoration.set(widgets, true);
-  };
-  const markdownPreviews = StateField.define<DecorationSet>({
-    create: previewsFor,
-    update(value, transaction) {
-      if (
-        transaction.docChanged ||
-        transaction.selection ||
-        transaction.reconfigured ||
-        getPath(transaction.startState) !== getPath(transaction.state) ||
-        isLivePreview(transaction.startState) !==
-          isLivePreview(transaction.state) ||
-        transaction.effects.some((e) => e.is(refresh))
-      )
-        return previewsFor(transaction.state);
-      return value;
-    },
-    provide: (field) => EditorView.decorations.from(field),
-  });
+  const previews = createMarkdownPreviews(host, getPath, isLive);
   return [
-    markdownPreviews,
+    previews,
     ViewPlugin.fromClass(
       class {
         decorations: DecorationSet = Decoration.none;
+        private tokens: DecorationSet = Decoration.none;
         private generation = 0;
         private dead = false;
         private timer?: number;
         private window: Window;
-        private path = "";
+        private policy = "";
+        private rule: ReturnType<typeof resolveRule> = null;
+        private foreground = "var(--text-normal)";
+        private background = "var(--code-background)";
+        private cache = new Map<string, HighlightResult | null>();
+        private jobs = new Map<string, Promise<HighlightResult | null>>();
+        private cachedChars = 0;
         private unsubscribe: () => void;
         constructor(private view: EditorView) {
           this.window = view.dom.ownerDocument.defaultView ?? window;
           this.unsubscribe = host.subscribe(() => {
             if (!this.dead)
-              this.view.dispatch({ effects: refresh.of(host.revision) });
+              view.dispatch({ effects: refreshEditor.of(host.revision) });
           });
+          this.synchronize();
           this.schedule();
         }
+        private selected() {
+          const rule = host.active && host.settings.enabled ? this.rule : null;
+          if (!rule?.enabled) return [];
+          const p = this.view.state.field(previews).decorations;
+          return codeRegions(this.view.state).filter((r) => {
+            if (
+              r.text.length > 200000 ||
+              !(r.kind === "inline" ? rule.inline : rule.blocks)
+            )
+              return false;
+            let hidden = false;
+            p.between(r.from, r.to, (from, to, v) => {
+              if (v.spec.block && from === r.from && to === r.to) hidden = true;
+            });
+            return !hidden && !!this.language(r);
+          });
+        }
+        private language(r: CodeRegion) {
+          const rule = this.rule;
+          return rule?.enabled
+            ? chooseLanguage(
+                r.language,
+                rule.language,
+                rule.paletteOnly,
+                rule.existingLanguage,
+              )
+            : null;
+        }
         update(update: ViewUpdate) {
-          const path = getPath(update.state);
+          const current = this.view.state.field(previews).decorations;
+          const previewChanged = !RangeSet.eq(
+            [current],
+            [update.startState.field(previews).decorations],
+          );
+          if (update.docChanged) {
+            if (host.active && host.settings.enabled && this.rule?.enabled)
+              codeRegions(update.state, update.startState, update.changes);
+            this.tokens = this.tokens.map(update.changes);
+          }
           if (
             update.docChanged ||
             update.viewportChanged ||
-            (update.selectionSet &&
-              !!host.renderMarkdown &&
-              isLivePreview(update.state)) ||
-            isLivePreview(update.startState) !== isLivePreview(update.state) ||
-            path !== this.path ||
+            previewChanged ||
+            getPath(update.startState) !== getPath(update.state) ||
             update.transactions.some((t) =>
-              t.effects.some((e) => e.is(refresh)),
+              t.effects.some((e) => e.is(refreshEditor)),
             )
           ) {
-            this.decorations = Decoration.none;
+            this.synchronize();
             this.schedule();
           }
+        }
+        private synchronize() {
+          const rule = getPath(this.view.state)
+            ? resolveRule(getPath(this.view.state), host.settings)
+            : null;
+          this.rule = rule;
+          const policy = JSON.stringify([
+            getPath(this.view.state),
+            rule,
+            host.active,
+            host.settings.enabled,
+          ]);
+          if (this.policy !== policy) {
+            this.tokens = Decoration.none;
+            this.policy = policy;
+          }
+          const regions = this.selected(),
+            doc = this.view.state.doc;
+          const retained: Range<Decoration>[] = [];
+          function firstOverlapping(
+            items: readonly { to: number }[],
+            from: number,
+          ) {
+            let low = 0,
+              high = items.length;
+            while (low < high) {
+              const middle = (low + high) >>> 1;
+              if (items[middle].to <= from) low = middle + 1;
+              else high = middle;
+            }
+            return low;
+          }
+          this.tokens.between(0, doc.length, (from, to, value) => {
+            for (
+              let i = firstOverlapping(regions, from);
+              i < regions.length && regions[i].from < to;
+              i++
+            ) {
+              const r = regions[i];
+              if (value.spec.cpLanguage !== this.language(r)) continue;
+              for (
+                let j = firstOverlapping(r.segments, from);
+                j < r.segments.length && r.segments[j].from < to;
+                j++
+              ) {
+                const s = r.segments[j];
+                let a = Math.max(from, s.from),
+                  b = Math.min(to, s.to);
+                while (a < b) {
+                  const line = doc.lineAt(a),
+                    end = Math.min(b, line.to);
+                  if (end > a) retained.push(value.range(a, end));
+                  a = end < b ? end + 1 : b;
+                }
+              }
+            }
+          });
+          this.tokens = Decoration.set(retained, true);
+          const base = paintEditor(
+            regions.map((region) => ({
+              region,
+              result: {
+                foreground: this.foreground,
+                background: this.background,
+                tokens: [],
+              },
+            })),
+            doc,
+            this.view.visibleRanges,
+            host.settings,
+            (r) => this.language(r),
+          );
+          this.decorations = base.update({ add: retained, sort: true });
         }
         private schedule() {
           this.generation++;
           this.window.clearTimeout(this.timer);
-          this.timer = this.window.setTimeout(() => void this.render(), 35);
+          this.timer = this.window.setTimeout(() => {
+            if (this.view.composing) {
+              this.schedule();
+              return;
+            }
+            void this.render();
+          }, 35);
         }
         private async render() {
-          if (this.dead || !host.active) return;
+          if (this.dead) return;
           const generation = this.generation,
-            doc = this.view.state.doc;
-          const path = getPath(this.view.state);
-          this.path = path;
-          const rule = path ? resolveRule(path, host.settings) : null;
-          if (!rule?.enabled) {
-            this.commit(Decoration.none, generation);
-            return;
-          }
-          const visible = this.view.visibleRanges;
-          const previews = this.view.state.field(markdownPreviews);
-          const selected = regionsFor(this.view.state).filter(
-            (r) =>
-              (r.kind === "inline" ? rule.inline : rule.blocks) &&
-              visible.some((v) => r.from <= v.to && r.to >= v.from) &&
-              !hasPreview(r),
+            doc = this.view.state.doc,
+            theme = host.theme(this.view.dom.ownerDocument),
+            visible = this.view.visibleRanges;
+          const regions = this.selected().filter((r) =>
+            visible.some((v) => r.from <= v.to && r.to >= v.from),
           );
-          function hasPreview(region: CodeRegion) {
-            let found = false;
-            previews.between(region.from, region.to, (from, to) => {
-              if (from === region.from && to === region.to) found = true;
-            });
-            return found;
-          }
-          const theme = host.theme(this.view.dom.ownerDocument);
           try {
             const items = await Promise.all(
-              selected.map(async (region) => {
-                const lang = chooseLanguage(
-                  region.language,
-                  rule.language,
-                  rule.paletteOnly,
-                  rule.existingLanguage,
-                );
-                return {
-                  region,
-                  result: lang
-                    ? await host.highlighter.highlight(region.text, lang, theme)
-                    : null,
-                };
+              regions.map(async (region) => {
+                const lang = this.language(region)!;
+                const key = lang + "\0" + theme + "\0" + region.text;
+                let result = this.cache.get(key);
+                if (!this.cache.has(key)) {
+                  let job = this.jobs.get(key);
+                  if (!job) {
+                    job = host.highlighter.highlight(region.text, lang, theme);
+                    this.jobs.set(key, job);
+                  }
+                  try {
+                    result = await job;
+                    if (!this.dead && !this.cache.has(key)) {
+                      this.cache.set(key, result);
+                      this.cachedChars += key.length;
+                      while (
+                        this.cache.size > 128 ||
+                        this.cachedChars > 2_000_000
+                      ) {
+                        const first = this.cache.keys().next().value!;
+                        this.cachedChars -= first.length;
+                        this.cache.delete(first);
+                      }
+                    }
+                  } finally {
+                    if (this.jobs.get(key) === job) this.jobs.delete(key);
+                  }
+                }
+                return { region, result: result ?? null };
               }),
             );
             if (
               this.dead ||
-              !host.active ||
               generation !== this.generation ||
               this.view.state.doc !== doc
             )
               return;
-            const marks: Range<Decoration>[] = [];
-            const lines = new Set<number>();
-            for (const { region: r, result } of items) {
-              if (!result) continue;
-              const vars = `--cp-fg:${result.foreground};--cp-bg:${result.background};color:${result.foreground}!important`;
-              if (r.kind === "block")
-                for (const viewport of visible) {
-                  const start = Math.max(r.from, viewport.from),
-                    end = Math.min(r.to - 1, viewport.to);
-                  if (end < start) continue;
-                  const first = doc.lineAt(start).number,
-                    last = doc.lineAt(end).number;
-                  for (let n = first; n <= last; n++) {
-                    const line = doc.line(n);
-                    if (
-                      !lines.has(line.from) &&
-                      visible.some(
-                        (v) => line.from <= v.to && line.to >= v.from,
-                      )
-                    ) {
-                      lines.add(line.from);
-                      marks.push(
-                        Decoration.line({
-                          class:
-                            "cp-code-line" +
-                            (host.settings.blockBackground
-                              ? " cp-background"
-                              : ""),
-                          attributes: {
-                            style: `--cp-fg:${result.foreground};--cp-bg:${result.background}`,
-                          },
-                        }).range(line.from),
-                      );
-                    }
-                  }
-                }
-              for (const segment of r.segments)
-                for (const viewport of visible) {
-                  const clipFrom = Math.max(segment.from, viewport.from),
-                    clipTo = Math.min(segment.to, viewport.to);
-                  if (clipTo <= clipFrom) continue;
-                  const background =
-                    r.kind === "inline" &&
-                    host.settings.inlineBackground === "theme";
-                  marks.push(
-                    Decoration.mark({
-                      class:
-                        r.kind === "inline"
-                          ? "cp-editor-inline" +
-                            (background ? " cp-background" : "")
-                          : "cp-editor-block",
-                      attributes: { style: vars },
-                    }).range(clipFrom, clipTo),
-                  );
-                  const offsetFrom = segment.offset + clipFrom - segment.from,
-                    offsetTo = segment.offset + clipTo - segment.from;
-                  // Binary search avoids rescanning every token for quoted/indented lines.
-                  let low = 0,
-                    high = result.tokens.length;
-                  while (low < high) {
-                    const middle = (low + high) >>> 1;
-                    if (result.tokens[middle].to <= offsetFrom)
-                      low = middle + 1;
-                    else high = middle;
-                  }
-                  for (
-                    let index = low;
-                    index < result.tokens.length &&
-                    result.tokens[index].from < offsetTo;
-                    index++
-                  ) {
-                    const t = result.tokens[index];
-                    const a = Math.max(t.from, offsetFrom),
-                      b = Math.min(t.to, offsetTo);
-                    if (b <= a) continue;
-                    const from = segment.from + a - segment.offset,
-                      to = segment.from + b - segment.offset;
-                    // Marks must not span a line break; CodeMirror keeps newline layout native.
-                    let p = from;
-                    while (p < to) {
-                      const line = doc.lineAt(p),
-                        end = Math.min(to, line.to);
-                      if (end > p)
-                        marks.push(
-                          Decoration.mark({
-                            class: "cp-syntax",
-                            attributes: {
-                              style: tokenStyle(t.color, t.fontStyle),
-                            },
-                          }).range(p, end),
-                        );
-                      p = end < to ? end + 1 : to;
-                    }
-                  }
-                }
+            if (this.view.composing) {
+              this.schedule();
+              return;
             }
-            this.commit(Decoration.set(marks, true), generation);
-          } catch (error) {
-            if (!this.dead) host.reportError(error);
+            const palette = items.find((i) => i.result)?.result;
+            if (palette) {
+              this.foreground = palette.foreground;
+              this.background = palette.background;
+            }
+            const paintedSet = paintEditor(
+              items,
+              doc,
+              visible,
+              host.settings,
+              (r) => this.language(r),
+            );
+            const tokens: Range<Decoration>[] = [];
+            paintedSet.between(0, doc.length, (from, to, v) => {
+              if (v.spec.class === "cp-syntax") tokens.push(v.range(from, to));
+            });
+            this.tokens = Decoration.set(tokens, true);
+            this.synchronize();
+            this.view.dispatch({ effects: painted.of(generation) });
+          } catch (e) {
+            if (!this.dead && generation === this.generation)
+              host.reportError(e);
           }
-        }
-        private commit(decorations: DecorationSet, generation: number) {
-          if (this.dead || generation !== this.generation) return;
-          this.decorations = decorations;
-          this.view.dispatch({ effects: painted.of(generation) });
         }
         destroy() {
           this.dead = true;
           this.generation++;
           this.window.clearTimeout(this.timer);
           this.unsubscribe();
+          this.cache.clear();
+          this.jobs.clear();
         }
       },
-      { decorations: (value) => value.decorations },
+      { decorations: (v) => v.decorations },
     ),
   ] as const;
 }

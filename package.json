@@ -1,6 +1,6 @@
 {
   "name": "obsidian-code-palette",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "Obsidian 文件与文件夹代码语言规则和独立代码配色",
   "type": "module",
@@ -17,7 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "@lezer/markdown": "^1.8.1",
-    "shiki": "^4.5.0"
+    "shiki": "^4.5.0",
+    "@lezer/common": "^1.5.4"
   },
   "devDependencies": {
     "@codemirror/language": "^6.13.1",

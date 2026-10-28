@@ -22,7 +22,8 @@ import {
   type Settings,
   type Rule,
 } from "./rules";
-import { createEditorExtension } from "./editor";
+import { createEditorExtension, finishMarkdownEditing } from "./editor";
+import type { EditorView } from "@codemirror/view";
 import { ReadingController, readingRoot } from "./reading";
 import { PaletteSettings } from "./settings";
 import { RuleModal, ThemePicker } from "./modals";
@@ -156,6 +157,16 @@ export default class CodePalette extends Plugin implements PaletteHost {
           await this.saveSettings();
           new Notice(`代码配色：${themeName(id)}`);
         }).open(),
+    });
+    this.addCommand({
+      id: "finish-markdown-editing",
+      name: "完成 Markdown 编辑并恢复正文预览",
+      editorCallback: (editor) => {
+        // Obsidian supplies the native CM6 view on its editor adapter.
+        const view = (editor as unknown as { cm?: EditorView }).cm;
+        if (view?.composing) new Notice("请完成输入法输入后再恢复预览。");
+        else if (view) finishMarkdownEditing(view);
+      },
     });
     this.addCommand({
       id: "show-effective-rule",

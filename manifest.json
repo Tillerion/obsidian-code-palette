@@ -1,9 +1,9 @@
 {
   "id": "code-palette",
   "name": "Code Palette",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "minAppVersion": "1.8.0",
-  "description": "Theme code with file or folder language rules, render Markdown replacement blocks as body content, and use a global palette for unmatched notes.",
+  "description": "Style code with scoped language rules, stable editing, independent themes and optional Markdown body previews.",
   "author": "Skrch",
   "isDesktopOnly": false
 }

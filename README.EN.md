@@ -10,6 +10,7 @@ Independent code themes for inline code, tables and code blocks in Obsidian. Set
 - **24 languages:** Python, C/C++, Java, JavaScript/TypeScript, SQL and more. Preserve existing code-block language labels by default, or override their highlighting language per rule.
 - **10 offline themes:** One Dark Pro, VS Code Dark+/Light+, GitHub Dark/Light, Dracula, Nord, Monokai and Solarized Dark/Light. Choose a fixed theme or follow light/dark mode.
 - **Markdown body:** A replacement rule targeting Markdown renders `text` blocks as headings, lists, tables and other Markdown content in reading and live preview.
+- **Stable editing:** Existing colors remain while typing and new tokens are applied together when ready. Incremental parsing and per-block caching reduce repeated work.
 - **Global palette:** Theme code in notes without matching rules. Existing file/folder/vault rules stay in control; unlabelled snippets in unmatched notes receive plain theme colors without language inference.
 - **Reading and editing:** Supports reading, live preview and source modes. Themes affect managed code areas; surrounding text and note contents remain unchanged.
 
@@ -43,7 +44,9 @@ For newly approved plugins, the in-app directory can take up to 24 hours to sync
 
 **Preserve or replace existing labels:** Under **已有代码块语言**, choose **保留已有语言（默认）** (preserve, default) or **替换为指定语言** (replace with the selected language). This is available for file, folder and vault-default rules.
 
-**Render a text block as Markdown:** Select Markdown as the rule language and enable replacement. Reading and live-preview views display rendered headings, lists, tables and other Markdown content. Double-click the live preview to edit its source; move the cursor outside the block to restore the preview. Source mode keeps the original fenced text editable.
+**Render a text block as Markdown:** Select Markdown as the rule language, enable replacement and turn on the independent **Markdown body preview** setting. Reading and live-preview views display rendered headings, lists and tables. Double-click to edit the source. The block stays in editing mode even when the cursor moves away. Click **完成编辑** (Finish editing) at its end, or run **完成 Markdown 编辑并恢复正文预览** (Finish Markdown editing and restore body preview), to restore the preview. Complete any IME composition first. Source mode always keeps the original fenced text editable.
+
+Turn off Markdown body preview to retain syntax highlighting without body rendering. The setting defaults to enabled when upgrading to 0.3.0, preserving existing previews.
 
 Replacement applies the selected language to all ordinary code blocks in that scope, not only `text` blocks. It changes display only; fence labels and source text remain unchanged. See the [example note](examples/替换已有语言.md).
 

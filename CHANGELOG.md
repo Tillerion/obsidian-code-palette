@@ -1,5 +1,13 @@
 # 更新记录
 
+## 0.3.0
+
+- 修复连续编辑时高亮先消失再出现的问题，保留映射后的词元和基础配色，新结果统一更新。
+- 引入增量区域解析和代码块缓存；普通代码的光标移动不重新计算高亮。
+- Markdown 正文预览增加独立开关；进入编辑后保持源码，点击“完成编辑”或执行对应命令才恢复正文。输入法组合期间禁止恢复预览。
+- 兼容已有配置、语言规则优先级和全局兜底配色，保留笔记原文及 ZIP 发布。
+- **English:** Keep code coloring continuous during edits, use incremental parsing and per-block caching, and add independent Markdown body previews with explicit edit completion and IME protection.
+
 ## 0.2.1
 
 - 修正 Markdown 替换：阅读与实时预览显示 Markdown 正文，源码模式保留原文；实时预览双击可编辑。

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { JSDOM } from "./dom.ts";
 import { EditorState, StateField, StateEffect } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { createEditorExtension } from "../src/editor.ts";
+import { createEditorExtension, finishMarkdownEditing } from "../src/editor.ts";
 import { Highlighter } from "../src/highlighter.ts";
 import { defaultSettings } from "../src/rules.ts";
 import type { PaletteHost } from "../src/host.ts";
@@ -130,6 +130,8 @@ test("live preview renders Markdown body, supports source editing and releases r
     assert.ok(view.state.selection.main.from > source.indexOf("```text"));
     assert.equal(view.state.doc.toString(), source);
     view.dispatch({ selection: { anchor: 0 } });
+    assert.equal(view.dom.querySelector(".cp-markdown-preview"), null);
+    finishMarkdownEditing(view);
     await until(() => !!view.dom.querySelector(".cp-markdown-preview"));
     view.dispatch({ effects: toggle.of(false) });
     await until(() => !view.dom.querySelector(".cp-markdown-preview"));

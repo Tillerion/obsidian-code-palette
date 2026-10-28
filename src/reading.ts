@@ -92,6 +92,7 @@ export class ReadingController {
           block &&
           !!code.parentElement?.parentNode &&
           text.length <= 200_000 &&
+          this.host.settings.markdownPreview &&
           rendersMarkdownBody(rule, explicit) &&
           this.host.renderMarkdown
         ) {
