@@ -1,7 +1,30 @@
 import type { EditorState, Text, ChangeDesc } from "@codemirror/state";
 import { TreeFragment } from "@lezer/common";
 import { parseCodeRegions } from "./markdown";
+import { proseRegions, type ProseOptions } from "./prose";
 const cache = new WeakMap<Text, ReturnType<typeof parseCodeRegions>>();
+const proseCache = new WeakMap<
+  Text,
+  Map<string, ReturnType<typeof proseRegions>>
+>();
+export function editorProseRegions(
+  state: EditorState,
+  language: string,
+  options: ProseOptions,
+) {
+  codeRegions(state);
+  const parsed = cache.get(state.doc)!;
+  let entries = proseCache.get(state.doc);
+  if (!entries) proseCache.set(state.doc, (entries = new Map()));
+  const key = language + +options.lines + +options.inline;
+  let regions = entries.get(key);
+  if (!regions) {
+    regions = proseRegions(parsed.source, parsed, language, options);
+    if (entries.size >= 8) entries.delete(entries.keys().next().value!);
+    entries.set(key, regions);
+  }
+  return regions;
+}
 export function codeRegions(
   state: EditorState,
   previous?: EditorState,

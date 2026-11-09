@@ -50,11 +50,14 @@ export function paintEditor(
           clipTo = Math.min(segment.to, viewport.to);
         if (clipTo <= clipFrom) continue;
         const background =
-          r.kind === "inline" && settings.inlineBackground === "theme";
+          !r.prose &&
+          r.kind === "inline" &&
+          settings.inlineBackground === "theme";
         marks.push(
           Decoration.mark({
-            class:
-              r.kind === "inline"
+            class: r.prose
+              ? "cp-editor-prose"
+              : r.kind === "inline"
                 ? "cp-editor-inline" + (background ? " cp-background" : "")
                 : "cp-editor-block",
             attributes: { style: vars },
@@ -92,7 +95,9 @@ export function paintEditor(
                   class: "cp-syntax",
                   cpLanguage: langFor(r),
                   attributes: {
-                    style: tokenStyle(t.color, t.fontStyle),
+                    style: r.prose
+                      ? `color:${t.color}!important`
+                      : tokenStyle(t.color, t.fontStyle),
                   },
                 }).range(p, end),
               );

@@ -15,7 +15,7 @@ import type { PaletteHost } from "./host";
 import type { HighlightResult } from "./highlighter";
 import { resolveRule, chooseLanguage } from "./rules";
 import type { CodeRegion } from "./markdown";
-import { codeRegions } from "./editor-regions";
+import { codeRegions, editorProseRegions } from "./editor-regions";
 import { createMarkdownPreviews, refreshEditor } from "./editor-preview";
 import { paintEditor } from "./editor-paint";
 export { finishMarkdownEditing } from "./editor-preview";
@@ -57,18 +57,28 @@ export function createEditorExtension(
           const rule = host.active && host.settings.enabled ? this.rule : null;
           if (!rule?.enabled) return [];
           const p = this.view.state.field(previews).decorations;
-          return codeRegions(this.view.state).filter((r) => {
-            if (
-              r.text.length > 200000 ||
-              !(r.kind === "inline" ? rule.inline : rule.blocks)
-            )
-              return false;
-            let hidden = false;
-            p.between(r.from, r.to, (from, to, v) => {
-              if (v.spec.block && from === r.from && to === r.to) hidden = true;
+          const normal = codeRegions(this.view.state);
+          const prose = !rule.paletteOnly
+            ? editorProseRegions(this.view.state, rule.language, {
+                lines: rule.proseLines === true,
+                inline: rule.proseInline === true,
+              })
+            : [];
+          return [...normal, ...prose]
+            .sort((a, b) => a.from - b.from)
+            .filter((r) => {
+              if (
+                r.text.length > 200000 ||
+                (!r.prose && !(r.kind === "inline" ? rule.inline : rule.blocks))
+              )
+                return false;
+              let hidden = false;
+              p.between(r.from, r.to, (from, to, v) => {
+                if (v.spec.block && from === r.from && to === r.to)
+                  hidden = true;
+              });
+              return !hidden && !!this.language(r);
             });
-            return !hidden && !!this.language(r);
-          });
         }
         private language(r: CodeRegion) {
           const rule = this.rule;

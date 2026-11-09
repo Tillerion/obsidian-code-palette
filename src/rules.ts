@@ -9,6 +9,8 @@ export interface Rule {
   inline: boolean;
   blocks: boolean;
   recursive: boolean;
+  proseLines?: boolean;
+  proseInline?: boolean;
 }
 export interface Settings {
   enabled: boolean;
@@ -68,7 +70,12 @@ export function resolveRule(
   if (folders[0])
     return { ...folders[0], source: `文件夹：${folders[0].path || "/"}` };
   if (settings.defaultRule)
-    return { ...settings.defaultRule, source: "仓库默认规则" };
+    return {
+      ...settings.defaultRule,
+      proseLines: false,
+      proseInline: false,
+      source: "仓库默认规则",
+    };
   return settings.globalPalette
     ? {
         kind: "folder",
@@ -166,6 +173,8 @@ export function normalizeSettings(raw: unknown): Settings {
       inline: r.inline !== false,
       blocks: r.blocks !== false,
       recursive: r.recursive !== false,
+      proseLines: r.proseLines === true,
+      proseInline: r.proseInline === true,
     };
   }
   if (Array.isArray(v.rules)) {

@@ -172,6 +172,26 @@ export class RuleModal extends Modal {
         this.draft.blocks = v;
       }),
     );
+    for (const [key, name, description] of [
+      [
+        "proseLines",
+        "识别正文中的独立代码段",
+        "按本规则语言识别未加反引号的代码行，不改变正文排版。",
+      ],
+      [
+        "proseInline",
+        "识别题干中的代码片段",
+        "识别说明文字中的明确代码片段；不确定的内容保持原样。",
+      ],
+    ] as const)
+      new Setting(el)
+        .setName(name)
+        .setDesc(description)
+        .addToggle((t) =>
+          t.setValue(this.draft[key] === true).onChange((v) => {
+            this.draft[key] = v;
+          }),
+        );
     if (this.kind === "folder")
       new Setting(el).setName("包含子文件夹").addToggle((t) =>
         t.setValue(this.draft.recursive).onChange((v) => {
@@ -202,6 +222,6 @@ export class RuleModal extends Modal {
 }
 export function describeRule(rule: Rule): string {
   return rule.enabled
-    ? `${languageName(rule.language)} · ${[rule.inline ? "行内代码" : "", rule.blocks ? "代码块" : ""].filter(Boolean).join("、") || "未启用代码类型"}${rule.existingLanguage === "replace" ? " · 替换已有语言" : " · 保留已有语言"}${rule.kind === "folder" ? (rule.recursive ? " · 含子目录" : " · 仅本层") : ""}`
+    ? `${languageName(rule.language)} · ${[rule.inline ? "行内代码" : "", rule.blocks ? "代码块" : "", rule.proseLines ? "正文代码段" : "", rule.proseInline ? "题干代码" : ""].filter(Boolean).join("、") || "未启用代码类型"}${rule.existingLanguage === "replace" ? " · 替换已有语言" : " · 保留已有语言"}${rule.kind === "folder" ? (rule.recursive ? " · 含子目录" : " · 仅本层") : ""}`
     : "已关闭插件效果";
 }

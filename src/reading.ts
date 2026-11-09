@@ -1,4 +1,5 @@
 import type { PaletteHost, MarkdownRenderHandle } from "./host";
+import { ReadingProseController } from "./reading-prose";
 import { chooseLanguage, resolveRule, rendersMarkdownBody } from "./rules";
 import {
   applyCode,
@@ -28,13 +29,21 @@ export class ReadingController {
   private observer?: MutationObserver;
   private timer?: number;
   private window: Window;
+  private prose: ReadingProseController;
   constructor(
     private root: HTMLElement,
     private path: string | (() => string),
     private host: PaletteHost,
+    proseSource?: () => string | undefined,
   ) {
     this.root = root = readingRoot(root);
     this.window = root.ownerDocument.defaultView ?? window;
+    this.prose = new ReadingProseController(
+      root,
+      () => this.getPath(),
+      host,
+      proseSource,
+    );
     const Observer = root.ownerDocument.defaultView?.MutationObserver;
     if (Observer) {
       this.observer = new Observer((mutations) => this.onMutations(mutations));
@@ -162,6 +171,7 @@ export class ReadingController {
     this.window.clearTimeout(this.timer);
     this.observer?.disconnect();
     this.release();
+    this.prose.dispose();
   }
   private getPath() {
     return typeof this.path === "function" ? this.path() : this.path;

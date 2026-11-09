@@ -53,6 +53,7 @@
   font-weight: normal;
 }
 .cp-editor-block span:not(.cp-syntax),
+.cp-editor-prose span:not(.cp-syntax),
 .cp-editor-inline span:not(.cp-syntax) {
   color: inherit !important;
 }

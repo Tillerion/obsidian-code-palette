@@ -103,6 +103,50 @@ function setup(source: string, markdown = false) {
     },
   };
 }
+
+test("unmarked exercise code is opt-in, color-only and stays painted while editing", async () => {
+  const source =
+    "题目：\nprint(42)\n\n运行 print(len(items)) 后输出什么？\n\n`return 7`";
+  const s = setup(source);
+  try {
+    await until(() => !!s.view.dom.querySelector(".cp-syntax"));
+    assert.equal(s.view.dom.querySelector(".cp-editor-prose"), null);
+    s.host.settings.rules[0].proseLines = true;
+    s.host.settings.rules[0].proseInline = true;
+    s.refresh();
+    await until(
+      () =>
+        !!s.view.dom.querySelector(
+          ".cp-editor-prose .cp-syntax, .cp-syntax .cp-editor-prose",
+        ),
+    );
+    assert.equal(s.view.state.doc.toString(), source);
+    assert.equal(
+      s.view.dom.querySelector(".cp-editor-prose.cp-background"),
+      null,
+    );
+    const real = s.host.highlighter.highlight.bind(s.host.highlighter);
+    s.host.highlighter.highlight = async (...args) => {
+      await sleep(120);
+      return real(...args);
+    };
+    const at = source.indexOf("42");
+    s.view.dispatch({ changes: { from: at, to: at + 2, insert: "43" } });
+    assert.ok(s.view.dom.querySelector(".cp-syntax"));
+    await until(() =>
+      [...s.view.dom.querySelectorAll(".cp-syntax")].some(
+        (e) => e.textContent === "43",
+      ),
+    );
+    s.host.settings.rules[0].proseLines = false;
+    s.host.settings.rules[0].proseInline = false;
+    s.refresh();
+    await until(() => !s.view.dom.querySelector(".cp-editor-prose"));
+    assert.ok(s.view.dom.querySelector(".cp-editor-inline"));
+  } finally {
+    s.close();
+  }
+});
 test("continuous typing keeps old colors and cursor movement never repaints unchanged code", async () => {
   const s = setup(
     "Intro\n\n```python\nreturn 1\n```\n\n```java\npublic class Demo {}\n```",

@@ -7,6 +7,7 @@ export interface CodeSegment {
   offset: number;
 }
 export interface CodeRegion {
+  prose?: boolean;
   kind: "inline" | "block";
   from: number;
   to: number;
@@ -101,5 +102,5 @@ export function parseCodeRegions(
       }
     },
   });
-  return { regions, tree, frontmatter };
+  return { regions, tree, frontmatter, source };
 }

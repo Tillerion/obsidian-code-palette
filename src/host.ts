@@ -12,6 +12,7 @@ export interface PaletteHost {
   theme(document?: Document): string;
   subscribe(callback: () => void): () => void;
   reportError(error: unknown): void;
+  readSource?(path: string): Promise<string | undefined>;
   renderMarkdown?(
     source: string,
     container: HTMLElement,

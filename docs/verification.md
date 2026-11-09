@@ -1,5 +1,22 @@
 # 验证记录
 
+## 0.3.1：习题正文识别与 Notebook Navigator
+
+日期：2026-11-09。本轮以后台验收为主，未切换用户笔记、未操作 Obsidian 前台鼠标，未覆盖用户当前安装文件或设置。
+
+- 68 项自动化测试、TypeScript 类型检查、生产构建及 ZIP 打包通过。
+
+- 自动化覆盖全部 24 种语言的识别样例与源码区域入口、中文题干、Python 列表／下标／多行表达式、SQL 分行查询，以及代码／属性／链接／双链／公式边界。
+- 文件／文件夹新开关默认关闭；仓库默认与全局配色无法启用正文识别，原有代码开关和规则优先级保留。
+- CodeMirror 集成验证启用／关闭、原文、背景不变、连续编辑保留着色；原有 Markdown 预览、显式完成和 IME 组合状态回归继续覆盖。
+- 阅读 DOM 覆盖排版节点保留、复制文本不变、变更刷新、过期异步结果、卸载恢复、嵌套控制器、HTML 重复文本歧义、嵌套同名标签、重新启用读取源文及原生换行形式。
+- 独立审查发现并修复数组被当链接、围栏中的公式标记屏蔽正文、多行上下文中断，以及调用识别与词元映射的二次方扫描。
+- 原生 Obsidian 离屏验收使用实际 MarkdownRenderer 与 Shiki，验证 Python、SQL、C++、Java、JavaScript、Markdown、HTML、XML 八类输出，文本与既有结构不变，订阅及包装完成清理。原生 `<br>\n` 和未知 XML 标签清理行为另有回归用例。
+- 本机 Notebook Navigator 3.5.0 / API 2.0.0 的公开菜单接口成功注册和注销文件／文件夹钩子各两项，无重复；自动化另验证右键目标、多选过滤、缺失 API、替换 API 和卸载。
+- 离屏测试临时关闭的 Electron 后台节流已恢复。未执行真实右键菜单点击、设置页视觉验收、真实输入法候选词操作或移动端测试。
+
+**English:** Background verification covers scoped opt-in recognition, all 24 source-region profiles, actual CM6 editing and reversible reading DOM. Native Obsidian offscreen checks passed for eight representative languages using its renderer and Shiki. Navigator 3.5.0 / API 2.0.0 registration/disposal succeeded. User notes, settings and installed plugin files were not changed. Foreground menu clicks, settings-page visuals, actual IME candidates and mobile remain untested.
+
 ## 0.3.0：稳定代码编辑与显式完成 Markdown 编辑
 
 日期：2026-10-28。Windows、Node.js 24.21.0、Obsidian 1.14.5。

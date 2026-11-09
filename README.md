@@ -4,12 +4,14 @@
 
 为 Obsidian 的行内代码、表格代码和代码块选择独立配色。按文件或文件夹设置默认语言，让学习笔记中的短代码也能获得语法高亮，笔记原文保持不变。
 
-**English:** Code Palette brings independent code themes to inline code, tables and code blocks in Obsidian. Set a language for a file or folder, choosing to preserve existing code-block labels or override them for highlighting. A separate global palette works without language guessing. It includes 24 languages and 10 offline themes, supports reading and editing views, and keeps Markdown content unchanged. See the [English guide](README.EN.md) for installation and usage.
+**English:** Code Palette brings independent themes to inline code, tables and code blocks in Obsidian. Set a language for a file or folder, preserving existing code-block labels or overriding their highlighting language. Manually enable unmarked exercise-code recognition in individual file/folder rules. A separate global palette works without language guessing. It includes 24 languages and 10 offline themes, supports stable reading/editing and Notebook Navigator menus, and keeps Markdown source unchanged. See the [English guide](README.EN.md).
 
 ## ✨ 功能
 
 - **范围规则：** 按文件、文件夹及子文件夹设置默认语言，也可设置仓库默认规则。
 - **多语言高亮：** 内置 Python、C/C++、Java、JavaScript/TypeScript、SQL 等 24 种常用语言，支持保留已有代码块语言或按规则替换高亮语言。
+- **习题正文识别：** 在文件或文件夹规则中手动开启，无需反引号也可识别独立代码段及题干中的明确代码片段，沿用所选语言和主题。
+- **Notebook Navigator：** 在其文件、文件夹右键菜单中直接设置规则或恢复继承。
 - **独立配色：** 10 套离线主题，包括 One Dark Pro、VS Code Dark+/Light+、GitHub、Dracula、Nord 等；可固定配色或跟随明暗模式。
 - **Markdown 正文：** 将规则语言设为 Markdown 并选择替换，可让 `text` 块显示为标题、列表、表格等正文，而不只是代码着色。
 - **全局代码配色：** 为未匹配语言规则的笔记统一代码外观，不覆盖已有规则；无标记代码使用基础文字色与背景色，不猜测语言。
@@ -56,6 +58,12 @@
 
 **选择主题：** 在插件设置中调整固定配色、深浅模式和代码背景。总开关可随时暂停显示效果，设置仍会保留。
 
+**未加反引号的习题代码：** 右键目标文件或文件夹 → **代码配色：设置语言规则** → 选择语言 → 开启 **识别正文中的独立代码段**，按需开启 **识别题干中的代码片段**。这两个开关默认关闭，独立于原有行内代码／代码块开关，仅适用于手动配置的文件、文件夹规则；全局配色和仓库默认规则不扫描正文。
+
+例如 `print(len(items))`、Python 列表和多行表达式、SQL 分行查询可在原文没有反引号时着色。正文识别沿用全部 24 种语言目录，仅调整文字颜色，保留字号、背景、段落、复制内容与原文；原生 Markdown／HTML／XML 阅读结构继续保留，已隐藏或移除的语法标记不会重新显示。可试用[习题正文示例](examples/习题正文识别.md)。
+
+**Notebook Navigator：** 启用该插件后，单个 Markdown 文件和文件夹的右键菜单自动出现规则入口，操作针对右键点击的目标。需要支持 Menus API 的版本；多选批量设置暂不提供，原生目录入口继续可用。
+
 ## 🖼️ 效果示例
 
 阅读视图示例（截图来自 v0.1.1）：
@@ -68,6 +76,8 @@
 - Mermaid、Dataview 等已知专用功能块保持原处理。`text` 等纯文本标记默认保持纯文本，启用替换模式后可按规则语言显示。
 - 提供语法高亮，不提供代码执行或语言服务器语义着色；普通标识符不一定呈现多种颜色。
 - 单段代码超过 200,000 字符时保留原生显示。
+- 正文识别采用所选语言的保守语法特征，不执行代码、不猜测全文语言，也不保证识别所有残缺代码；只有单独关键字或无法确定边界的文字可能保持原样。无法唯一对应源文的重复 HTML 元素保持原显示。
+- 只处理 Markdown 中可见的文字；图片、扫描件和 PDF 页面需要先转换为文本。
 
 ## 许可与反馈
 

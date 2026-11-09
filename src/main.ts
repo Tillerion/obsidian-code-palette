@@ -29,6 +29,7 @@ import { PaletteSettings } from "./settings";
 import { RuleModal, ThemePicker } from "./modals";
 import { languageName, themeName } from "./catalog";
 import type { PaletteHost } from "./host";
+import { NavigatorMenus, type AddMenuItem } from "./navigator";
 
 export default class CodePalette extends Plugin implements PaletteHost {
   declare settings: Settings;
@@ -87,23 +88,30 @@ export default class CodePalette extends Plugin implements PaletteHost {
           (!(file instanceof TFile) || file.extension !== "md")
         )
           return;
-        const kind = file instanceof TFolder ? "folder" : "file";
-        const path = cleanPath(file.path);
-        menu.addItem((item) =>
-          item
-            .setTitle("代码配色：设置语言规则")
-            .setIcon("palette")
-            .onClick(() => new RuleModal(this, kind, path).open()),
+        this.addRuleActions(
+          (callback) => menu.addItem(callback),
+          file instanceof TFolder ? "folder" : "file",
+          file.path,
         );
-        if (this.settings.rules.some((r) => r.kind === kind && r.path === path))
-          menu.addItem((item) =>
-            item
-              .setTitle("代码配色：恢复继承")
-              .setIcon("rotate-ccw")
-              .onClick(() => this.removeRule(kind, path)),
-          );
       }),
     );
+    // Navigator owns its menus. Use its public Menus API instead of patching UI
+    // or forwarding Obsidian's file-menu event (which has a different contract).
+    const navigator = new NavigatorMenus(
+      () =>
+        (
+          this.app as unknown as {
+            plugins?: { plugins?: Record<string, { api?: unknown }> };
+          }
+        ).plugins?.plugins?.["notebook-navigator"]?.api,
+      (add, kind, path) => this.addRuleActions(add, kind, path),
+    );
+    navigator.sync();
+    this.app.workspace.onLayoutReady(() => {
+      if (this.active) navigator.sync();
+    });
+    this.registerInterval(window.setInterval(() => navigator.sync(), 2000));
+    this.register(() => navigator.dispose());
     this.registerEvent(
       this.app.vault.on("rename", (file, oldPath) => {
         for (const r of this.readers) r.renamePath(oldPath, file.path);
@@ -209,7 +217,10 @@ export default class CodePalette extends Plugin implements PaletteHost {
   }
   private processReading(el: HTMLElement, ctx: MarkdownPostProcessorContext) {
     if (el.closest(".cp-markdown-preview")) return;
-    if (!el.querySelector("code") && el.tagName !== "CODE") return;
+    if (!el.querySelector("code") && el.tagName !== "CODE") {
+      const rule = resolveRule(ctx.sourcePath, this.settings);
+      if (!rule?.enabled || (!rule.proseLines && !rule.proseInline)) return;
+    }
     el = readingRoot(el);
     this.observeDocument(el.ownerDocument);
     class PaletteChild extends MarkdownRenderChild {
@@ -225,6 +236,7 @@ export default class CodePalette extends Plugin implements PaletteHost {
           el,
           ctx.sourcePath,
           this.plugin,
+          () => ctx.getSectionInfo(el)?.text,
         );
         this.plugin.readers.add(this.controller);
       }
@@ -265,6 +277,12 @@ export default class CodePalette extends Plugin implements PaletteHost {
         this.removeChild(component);
       },
     };
+  }
+  async readSource(path: string) {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    return file instanceof TFile && file.extension === "md"
+      ? this.app.vault.cachedRead(file)
+      : undefined;
   }
   subscribe(callback: () => void) {
     this.listeners.add(callback);
@@ -321,6 +339,35 @@ export default class CodePalette extends Plugin implements PaletteHost {
     const f = this.app.workspace.getActiveFile();
     if (f?.extension === "md") new RuleModal(this, "file", f.path).open();
     else new Notice("请先打开一篇 Markdown 笔记");
+  }
+  private addRuleActions(
+    add: AddMenuItem,
+    kind: "file" | "folder",
+    rawPath: string,
+  ) {
+    const path = cleanPath(rawPath);
+    add((item) =>
+      item
+        .setTitle("代码配色：设置语言规则")
+        .setIcon("palette")
+        .onClick(() => {
+          const target = this.app.vault.getAbstractFileByPath(path);
+          if (
+            (kind === "file" &&
+              target instanceof TFile &&
+              target.extension === "md") ||
+            (kind === "folder" && target instanceof TFolder)
+          )
+            new RuleModal(this, kind, path).open();
+        }),
+    );
+    if (this.settings.rules.some((r) => r.kind === kind && r.path === path))
+      add((item) =>
+        item
+          .setTitle("代码配色：恢复继承")
+          .setIcon("rotate-ccw")
+          .onClick(() => this.removeRule(kind, path)),
+      );
   }
   private updateStatus() {
     if (!this.status || !this.settings) return;

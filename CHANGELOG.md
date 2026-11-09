@@ -1,5 +1,15 @@
 # 更新记录
 
+## 0.3.1
+
+- 新增正文代码识别，覆盖原有 24 种语言，分别控制独立代码段与题干中的代码片段。
+- 正文识别仅在手动开启的文件／文件夹规则中生效，默认关闭；全局配色和仓库默认行为不变。
+- 正文识别只改变文字颜色，保留排版、复制内容和笔记原文；继续保护代码围栏、链接、双链、属性、公式和功能块。
+- 支持 Python 列表、下标和多行表达式，以及 SQL 分行查询；缓存与区间查找减少重复扫描。
+- 保留原生 Markdown／HTML／XML 阅读结构，并给可见文字应用配色；无法唯一匹配的 HTML 片段保留原样。
+- 接入 Notebook Navigator 文件和文件夹右键菜单，支持设置语言规则与恢复继承，无需返回原生目录。
+- **English:** Add opt-in prose-code recognition for all 24 languages in explicit file/folder rules, preserve source/layout and global/vault-default behavior, and integrate Notebook Navigator rule menus.
+
 ## 0.3.0
 
 - 修复连续编辑时高亮先消失再出现的问题，保留映射后的词元和基础配色，新结果统一更新。

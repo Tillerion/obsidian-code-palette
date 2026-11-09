@@ -8,6 +8,8 @@ Independent code themes for inline code, tables and code blocks in Obsidian. Set
 
 - **Scope rules:** Set a default language for a file, a folder and its subfolders, or the vault.
 - **24 languages:** Python, C/C++, Java, JavaScript/TypeScript, SQL and more. Preserve existing code-block language labels by default, or override their highlighting language per rule.
+- **Exercise code in prose:** Opt in per file/folder to recognize unmarked code lines and clear code fragments inside questions, using the selected language and theme.
+- **Notebook Navigator:** Set language rules or restore inheritance directly from its file/folder context menus.
 - **10 offline themes:** One Dark Pro, VS Code Dark+/Light+, GitHub Dark/Light, Dracula, Nord, Monokai and Solarized Dark/Light. Choose a fixed theme or follow light/dark mode.
 - **Markdown body:** A replacement rule targeting Markdown renders `text` blocks as headings, lists, tables and other Markdown content in reading and live preview.
 - **Stable editing:** Existing colors remain while typing and new tokens are applied together when ready. Incremental parsing and per-block caching reduce repeated work.
@@ -54,6 +56,12 @@ Replacement applies the selected language to all ordinary code blocks in that sc
 
 **Theme selection:** Choose fixed/light/dark themes and background preferences in plugin settings. The master switch pauses the effect while preserving settings.
 
+**Unmarked exercise code:** Open a file/folder rule, select its language, then enable **识别正文中的独立代码段** (standalone code) and optionally **识别题干中的代码片段** (code inside questions). Both default off and are independent of the existing inline/block switches. They apply only to manually configured file/folder rules: global palette and vault defaults never scan prose.
+
+All 24 bundled language profiles are available. Recognition changes text colors only, preserving typography, backgrounds, paragraph layout, copied text and source. Native Markdown/HTML/XML structure remains rendered; hidden or sanitized syntax is not reconstructed. See the [exercise examples](examples/习题正文识别.md).
+
+**Notebook Navigator:** Its single-Markdown-file and folder context menus automatically expose the same rule actions. Actions target the clicked item. A version with the public Menus API is required. Multi-file batch editing is not included; native Explorer menus remain available.
+
 ## 🖼️ Preview
 
 Reading view example, captured in v0.1.1:
@@ -66,6 +74,8 @@ Reading view example, captured in v0.1.1:
 - Known functional blocks such as Mermaid and Dataview keep their original handling. Plain-text labels remain plain by default; replacement mode can highlight them using the selected rule language.
 - Syntax highlighting does not provide code execution or language-server semantic coloring. Ordinary identifiers may use the base text color.
 - Individual snippets over 200,000 characters retain native display.
+- Prose detection uses conservative syntax hints for the selected language, without executing code or guessing a language. Isolated keywords, ambiguous/incomplete fragments and duplicate HTML elements that cannot be uniquely mapped may remain unchanged.
+- Only visible Markdown text is processed. Images, scans and PDF pages must first be converted to text.
 
 ## License and feedback
 
