@@ -1,7 +1,7 @@
 {
   "id": "code-palette",
   "name": "Code Palette",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "minAppVersion": "1.8.0",
   "description": "Style code with scoped language rules, optional prose-code highlighting and independent themes.",
   "author": "Skrch",

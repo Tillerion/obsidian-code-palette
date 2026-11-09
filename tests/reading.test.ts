@@ -290,6 +290,44 @@ test("HTML matching skips ambiguous identical paragraphs and preserves nested sa
   }
 });
 
+test("HTML parsing keeps templates inert and skips source that could close the parsing container", async () => {
+  const dom = new JSDOM("<section><div>Hello</div></section>"),
+    root = dom.window.document.querySelector("section")!;
+  const highlighter = new Highlighter();
+  let calls = 0;
+  const real = highlighter.highlight.bind(highlighter);
+  highlighter.highlight = (...args) => {
+    calls++;
+    return real(...args);
+  };
+  const host: PaletteHost = {
+    settings: normalizeSettings({
+      rules: [
+        { kind: "file", path: "note.md", language: "html", proseLines: true },
+      ],
+    }),
+    highlighter,
+    active: true,
+    revision: 0,
+    theme: () => "one-dark-pro",
+    subscribe: () => () => {},
+    readSource: async () => '<div>Hello</template><img src="https://example.invalid/probe"></div>',
+    reportError: (e) => {
+      throw e;
+    },
+  };
+  const c = new ReadingController(root, "note.md", host);
+  try {
+    await new Promise((r) => setTimeout(r, 50));
+    assert.equal(calls, 0);
+    assert.equal(root.innerHTML, "<div>Hello</div>");
+  } finally {
+    c.dispose();
+    highlighter.dispose();
+    dom.window.close();
+  }
+});
+
 test("native BR plus newline keeps multiline SQL context and sanitized XML still colors visible text", async () => {
   for (const [language, html, source, expected] of [
     [

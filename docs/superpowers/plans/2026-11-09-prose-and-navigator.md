@@ -40,6 +40,6 @@
 
 ### 4. Release
 
-- [ ] Update bilingual README, one-change-per-line changelog, examples, verification and release notes; version/package/lock/compatibility 0.3.1.
-- [ ] Run `npm run package`; inspect archive and diff; commit/push main and bare 0.3.1 tag.
+- [x] Update bilingual README, one-change-per-line changelog, examples, verification and release notes; version/package/lock/compatibility 0.3.1.
+- [x] Run `npm run package`; inspect archive and diff; commit/push main and bare 0.3.1 tag.
 - [ ] Verify Actions and published assets; check community scan when accessible. Keep ZIP available. Report actual verification boundaries.

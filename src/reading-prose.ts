@@ -95,9 +95,17 @@ function htmlCandidates(root: HTMLElement, source: string): HTMLElement[] {
         node.name === "HTMLTag" ? (node.node.parent?.to ?? node.to) : node.to,
       );
       if (!/^<[A-Za-z]/.test(raw)) return false;
-      // Template contents stay inert and are never inserted into the document.
-      const template = root.ownerDocument.createElement("template");
-      template.innerHTML = raw;
+      // Keep resource-bearing elements inside inert template contents. Ignore
+      // template syntax itself so source cannot close our parsing container.
+      if (/<\/?template(?:\s|\/?>)/i.test(raw)) return false;
+      const Parser = root.ownerDocument.defaultView!.DOMParser;
+      const parsed = new Parser().parseFromString(
+        "<template>" + raw + "</template>",
+        "text/html",
+      );
+      const template = parsed.querySelector("template");
+      if (!template) return false;
+      // Never adopt parsed nodes: visible output uses textContent spans only.
       for (const original of template.content.children) {
         const tag = original.localName;
         if (

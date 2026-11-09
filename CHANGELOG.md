@@ -1,5 +1,11 @@
 # 更新记录
 
+## 0.3.2
+
+- 修正社区审核拦截的 HTML 解析方式，使用隔离文档读取结构，不再给 innerHTML 赋值。
+- 保留 0.3.1 的正文识别与 Notebook Navigator 功能、规则设置和笔记原文。
+- **English:** Replace the HTML parsing assignment rejected by community review with isolated-document parsing; retain all 0.3.1 features and settings.
+
 ## 0.3.1
 
 - 新增正文代码识别，覆盖原有 24 种语言，分别控制独立代码段与题干中的代码片段。

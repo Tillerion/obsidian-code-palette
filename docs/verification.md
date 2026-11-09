@@ -1,5 +1,11 @@
 # 验证记录
 
+## 0.3.2：社区审核兼容修正
+
+- 0.3.1 的实际社区扫描拦截 HTML 解析中的 innerHTML 赋值；改为隔离文档解析，解析节点不插入活动笔记，笔记着色仍仅创建文字 span。
+- 保留 0.3.1 标签与发布历史，使用 0.3.2 发布修正，功能与配置格式不变。
+- 通过隔离文档内的惰性 template 读取结构，跳过源文自身的 template 标签；新增边界回归，69 项测试、类型检查、生产构建与 ZIP 打包通过。
+
 ## 0.3.1：习题正文识别与 Notebook Navigator
 
 日期：2026-11-09。本轮以后台验收为主，未切换用户笔记、未操作 Obsidian 前台鼠标，未覆盖用户当前安装文件或设置。
@@ -14,6 +20,8 @@
 - 原生 Obsidian 离屏验收使用实际 MarkdownRenderer 与 Shiki，验证 Python、SQL、C++、Java、JavaScript、Markdown、HTML、XML 八类输出，文本与既有结构不变，订阅及包装完成清理。原生 `<br>\n` 和未知 XML 标签清理行为另有回归用例。
 - 本机 Notebook Navigator 3.5.0 / API 2.0.0 的公开菜单接口成功注册和注销文件／文件夹钩子各两项，无重复；自动化另验证右键目标、多选过滤、缺失 API、替换 API 和卸载。
 - 离屏测试临时关闭的 Electron 后台节流已恢复。未执行真实右键菜单点击、设置页视觉验收、真实输入法候选词操作或移动端测试。
+- [GitHub Actions 0.3.1](https://github.com/Tillerion/obsidian-code-palette/actions/runs/42614230328) 已完成远端测试、构建、打包、四个附件的来源证明与核验。正式发布标签为 `0.3.1`；三个安装文件与本地构建摘要一致。
+- 下载后的正式 ZIP 共 22 个条目，三个安装文件与本地构建一致，无个人配置、凭据或依赖目录；SHA-256 为 `cc27bf7d49421733763d3eb1404b93cd0fc7ff06e74eba103dc9cd4cddeec82e`。
 
 **English:** Background verification covers scoped opt-in recognition, all 24 source-region profiles, actual CM6 editing and reversible reading DOM. Native Obsidian offscreen checks passed for eight representative languages using its renderer and Shiki. Navigator 3.5.0 / API 2.0.0 registration/disposal succeeded. User notes, settings and installed plugin files were not changed. Foreground menu clicks, settings-page visuals, actual IME candidates and mobile remain untested.
 
