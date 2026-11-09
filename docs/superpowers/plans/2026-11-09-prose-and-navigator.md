@@ -42,4 +42,6 @@
 
 - [x] Update bilingual README, one-change-per-line changelog, examples, verification and release notes; version/package/lock/compatibility 0.3.1.
 - [x] Run `npm run package`; inspect archive and diff; commit/push main and bare 0.3.1 tag.
-- [ ] Verify Actions and published assets; check community scan when accessible. Keep ZIP available. Report actual verification boundaries.
+- [x] Verify Actions and published assets; check community scan when accessible. Keep ZIP available. Report actual verification boundaries.
+
+The initial 0.3.1 scan rejected an innerHTML parsing assignment. The compatible follow-up 0.3.2 preserves the feature scope and original tags. Its 69 tests, hosted release/attestations, archive verification and community scan (`332d076 / Completed`, no Error) passed. Native offscreen checks cover the main rendering paths; foreground menu interaction and mobile remain untested.

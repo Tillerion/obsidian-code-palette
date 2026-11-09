@@ -5,6 +5,12 @@
 - 0.3.1 的实际社区扫描拦截 HTML 解析中的 innerHTML 赋值；改为隔离文档解析，解析节点不插入活动笔记，笔记着色仍仅创建文字 span。
 - 保留 0.3.1 标签与发布历史，使用 0.3.2 发布修正，功能与配置格式不变。
 - 通过隔离文档内的惰性 template 读取结构，跳过源文自身的 template 标签；新增边界回归，69 项测试、类型检查、生产构建与 ZIP 打包通过。
+- 原生 Obsidian 后台复验 HTML、XML、SQL，分别经过两轮实际主题切换，词元数量稳定、文字与结构保持，卸载清理及后台节流恢复通过。
+- [GitHub Actions 0.3.2](https://github.com/Tillerion/obsidian-code-palette/actions/runs/42615580487) 成功完成测试、构建、打包及四个附件的来源证明与核验；三个发布安装文件与本地构建相同。
+- 下载后的正式 ZIP 共 22 个条目，三个安装文件摘要一致；ZIP SHA-256 为 `f78107a845b1e0933376a8fa88682d728c7942701d97bb566014593a7c72818a`。
+- 社区正式扫描为 `0.3.2 / 332d076 / Completed`，没有 Error，主程序逐字节构建复现通过；公开页面显示 0.3.2，安装入口恢复可用，功能说明已包含正文识别与 Notebook Navigator。保留非阻断 Warning/Recommendation。
+
+**English:** All 69 tests, type checking, production build and packaging passed. Native offscreen HTML/XML/SQL checks retained text and structure across two theme changes. Hosted build, four asset attestations and downloaded archive hashes passed. The community scan is Completed with no Error findings and a byte-for-byte reproducible build; the public listing shows 0.3.2 with its install link enabled. Non-blocking advisories remain. No foreground Obsidian interaction or mobile testing was performed.
 
 ## 0.3.1：习题正文识别与 Notebook Navigator
 
